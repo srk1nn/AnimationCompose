@@ -10,7 +10,7 @@ import UIKit
 final class SecondaryButton: UIButton {
     override var isEnabled: Bool {
         didSet {
-            tintColor = isEnabled ? UIColor(named: "details") : UIColor(named: "disabled")
+            tintColor = isEnabled ? .details : .disabled
         }
     }
 }
@@ -18,7 +18,7 @@ final class SecondaryButton: UIButton {
 final class PrimaryButton: UIButton {
     override var isSelected: Bool {
         didSet {
-            tintColor = isSelected ? UIColor(named: "selected") : UIColor(named: "details")
+            tintColor = isSelected ? .selected : .details
         }
     }
 }
@@ -28,7 +28,7 @@ final class BorderButton: UIButton {
         didSet {
             layer.cornerRadius = bounds.width / 2
             layer.borderWidth = isSelected ? 1.5 : 0
-            layer.borderColor = UIColor(named: "selected")?.cgColor
+            layer.borderColor = UIColor.selected.cgColor
         }
     }
 }

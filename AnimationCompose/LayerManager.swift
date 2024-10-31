@@ -12,69 +12,119 @@ final class LayerManager {
 
     private let undoManager = UndoManager()
     private var layers = [Layer(lines: [])]
+    private var currentIndex = 0
 
     // MARK: - Lines
 
     func startLine(settings: Line.Settings, stroke: Stroke) {
         let line = Line(stroke: stroke, settings: settings)
-        layers.last?.startDrawingLine(line)
+        layers[currentIndex].startDrawingLine(line)
     }
 
     func endLine() {
-        layers.last?.takeDrawingLine()
-        undoManager.registerUndo(withTarget: self, selector: #selector(undoEndLine), object: nil)
+        let layer = layers[currentIndex]
+        layer.takeDrawingLine()
+        undoManager.registerUndo(withTarget: self, selector: #selector(undoEndLine), object: layer)
     }
 
     // MARK: - Layers
 
     /// This method may fail, due to number of layers limit
-    @objc func addLayer() -> Bool {
+    func addLayer() -> Bool {
         if layers.count == Int.max {
             // Clause: Максимальное количество кадров не может превышать Int.max
             return false
         }
 
-        let layer = Layer(lines: [])
-        layers.append(layer)
-        undoManager.registerUndo(withTarget: self, selector: #selector(undoAddLayer), object: nil)
+        registerUndo {
+            let layer = Layer(lines: [])
+            layers.insert(layer, at: currentIndex + 1)
+            currentIndex += 1
+        }
+
         return true
     }
 
     /// This method may fail, due to number of layers limit
     func insertLayer(_ layer: Layer, at index: Int) -> Bool {
-        insertLayer(
-            InsertOptions(layer: layer, index: index)
-        )
+        if layers.count == Int.max {
+            return false
+        }
+
+        registerUndo {
+            layers.insert(layer, at: index)
+            if currentIndex >= index {
+                currentIndex += 1
+            }
+        }
+
+        return true
     }
 
     func removeLayer() {
-        removeLayerAtIndex((layers.endIndex - 1) as NSNumber)
+        registerUndo {
+            layers.remove(at: currentIndex)
+
+            if layers.isEmpty {
+                assert(currentIndex == 0)
+                layers.append(Layer(lines: []))
+            } else {
+                currentIndex -= 1
+            }
+        }
     }
 
     func removeLayer(at index: Int) {
-        removeLayerAtIndex(index as NSNumber)
+        registerUndo {
+            layers.remove(at: index)
+
+            if layers.isEmpty {
+                assert(currentIndex == 0)
+                layers.append(Layer(lines: []))
+            } else {
+                let hasAnotherLayers = currentIndex - 1 >= 0
+                if hasAnotherLayers && currentIndex >= index {
+                    currentIndex -= 1
+                }
+            }
+        }
     }
 
-    @objc func removeAllLayers() {
-        let removed = layers
-        layers.removeAll(keepingCapacity: true)
-        layers.append(Layer(lines: []))
-        undoManager.registerUndo(withTarget: self, selector: #selector(undoRemoveAll), object: removed)
+    func removeAllLayers() {
+        registerUndo {
+            layers.removeAll(keepingCapacity: true)
+            layers.append(Layer(lines: []))
+            currentIndex = 0
+        }
     }
 
     func moveLayers(from source: Int, to destination: Int) {
-        let layer = layers.remove(at: source)
-        layers.insert(layer, at: destination)
-        undoManager.registerUndo(withTarget: self, selector: #selector(undoMoveLayers), object: MoveOptions(source: destination, destination: source))
+        registerUndo {
+            let layer = layers.remove(at: source)
+            layers.insert(layer, at: destination)
+            
+            let current = currentIndex
+
+            if current == source {
+                currentIndex = destination
+            } else if source < destination, current > source, current <= destination {
+                currentIndex -= 1
+            } else if destination < source, current >= destination, current < source {
+                currentIndex += 1
+            }
+        }
     }
 
-    func lastLayer() -> Layer {
-        // Just in case. Manager always should contains at least 1 layer
-        layers.last ?? Layer(lines: [])
+    func selectLayer(at index: Int) {
+        currentIndex = index
+    }
+
+    func currentLayer() -> Layer {
+        layers[currentIndex]
     }
 
     func previousLayer() -> Layer? {
-        layers[safe: layers.endIndex - 2]
+        layers[safe: currentIndex - 1]
     }
 
     func allLayers() -> [Layer] {
@@ -100,110 +150,51 @@ final class LayerManager {
     }
 }
 
-private extension LayerManager {
-
-    @objc func insertLayer(_ options: InsertOptions) -> Bool {
-        if layers.count == Int.max {
-            return false
-        }
-
-        layers.insert(options.layer, at: options.index)
-        undoManager.registerUndo(withTarget: self, selector: #selector(undoInsertLayer), object: options.index as NSNumber)
-        return true
-    }
-
-    @objc func removeLayerAtIndex(_ index: NSNumber) {
-        var firstLayerRemoved = false
-        let layer = layers.remove(at: index.intValue)
-
-        if layers.isEmpty {
-            firstLayerRemoved = true
-            layers.append(Layer(lines: []))
-        }
-
-        undoManager.registerUndo(withTarget: self, selector: #selector(undoRemoveLayer), object: UndoRemove(
-            shouldRemoveFirstLayer: firstLayerRemoved,
-            layer: layer,
-            index: index.intValue
-        ))
-    }
-}
-
 // MARK: - Undo & Redo
 
 @objc
 private extension LayerManager {
 
-    func undoEndLine() {
-        let line = layers.last?.popLine()
-        undoManager.registerUndo(withTarget: self, selector: #selector(redoEndLine), object: line)
+    func undoEndLine(_ layer: Layer) {
+        let line = layer.popLine()
+        undoManager.registerUndo(withTarget: self, selector: #selector(redoEndLine), object: EndLineOptions(layer: layer, line: line))
     }
 
-    func redoEndLine(_ line: Line?) {
-        line.map { layers.last?.pushLine($0) }
-        undoManager.registerUndo(withTarget: self, selector: #selector(undoEndLine), object: nil)
+    func redoEndLine(_ options: EndLineOptions) {
+        options.line.map { options.layer.pushLine($0) }
+        undoManager.registerUndo(withTarget: self, selector: #selector(undoEndLine), object: options.layer)
     }
 
-    func undoAddLayer() {
-        layers.removeLast()
-        undoManager.registerUndo(withTarget: self, selector: #selector(addLayer), object: nil)
-    }
-
-    func undoInsertLayer(_ index: NSNumber) {
-        let layer = layers.remove(at: index.intValue)
-        undoManager.registerUndo(withTarget: self, selector: #selector(insertLayer(_:)), object: InsertOptions(layer: layer, index: index.intValue))
-    }
-
-    func undoRemoveLayer(_ options: UndoRemove) {
-        if options.shouldRemoveFirstLayer {
-            layers.removeFirst()
+    func undoSnapshot(_ snapshot: Snapshot) {
+        registerUndo {
+            layers = snapshot.layers
+            currentIndex = snapshot.currentIndex
         }
-
-        layers.insert(options.layer, at: options.index)
-        undoManager.registerUndo(withTarget: self, selector: #selector(removeLayerAtIndex), object: options.index as NSNumber)
     }
 
-    func undoMoveLayers(_ options: MoveOptions) {
-        let layer = layers.remove(at: options.source)
-        layers.insert(layer, at: options.destination)
-        undoManager.registerUndo(withTarget: self, selector: #selector(undoMoveLayers), object: MoveOptions(source: options.destination, destination: options.source))
+    func registerUndo(_ action: () -> Void) {
+        let snapshot = Snapshot(layers: layers, currentIndex: currentIndex)
+        action()
+        undoManager.registerUndo(withTarget: self, selector: #selector(undoSnapshot), object: snapshot)
     }
 
-    func undoRemoveAll(_ removed: [Layer]) {
-        layers.removeAll(keepingCapacity: true)
-        layers.append(contentsOf: removed)
-        undoManager.registerUndo(withTarget: self, selector: #selector(removeAllLayers), object: nil)
-    }
-
-    final class InsertOptions: NSObject {
+    final class EndLineOptions: NSObject {
         let layer: Layer
-        let index: Int
+        let line: Line?
 
-        init(layer: Layer, index: Int) {
+        init(layer: Layer, line: Line?) {
             self.layer = layer
-            self.index = index
+            self.line = line
         }
     }
 
-    final class MoveOptions: NSObject {
-        let source: Int
-        let destination: Int
+    final class Snapshot: NSObject {
+        let layers: [Layer]
+        let currentIndex: Int
 
-        init(source: Int, destination: Int) {
-            self.source = source
-            self.destination = destination
-        }
-    }
-
-    final class UndoRemove: NSObject {
-        let shouldRemoveFirstLayer: Bool
-        let layer: Layer
-        let index: Int
-
-        init(shouldRemoveFirstLayer: Bool, layer: Layer, index: Int) {
-            self.shouldRemoveFirstLayer = shouldRemoveFirstLayer
-            self.layer = layer
-            self.index = index
+        init(layers: [Layer], currentIndex: Int) {
+            self.layers = layers
+            self.currentIndex = currentIndex
         }
     }
 }

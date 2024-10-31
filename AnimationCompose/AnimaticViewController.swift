@@ -104,6 +104,8 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
         cell.drawingView.relativeToCanvas = canvas
         cell.drawingView.drawingLayer = layer
         cell.tipView.isHidden = !shouldShowTip(for: indexPath)
+        cell.contentView.layer.borderColor = UIColor.selected.cgColor
+        cell.contentView.layer.borderWidth = (layer === layerManager.currentLayer()) ? 5 : 0
 
         cell.moreButton.menu = UIMenu(children: [
             UIAction(title: "Дублировать", image: UIImage(systemName: "square.2.layers.3d"), handler: { [weak self] _ in
@@ -112,14 +114,9 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
                 }
 
                 let newLayer = Layer(layer: layer)
-                let newIndexPath = IndexPath(item: indexPath.item + 1, section: indexPath.section)
-                // TODO: not ignore error
-                _ = layerManager.insertLayer(newLayer, at: newIndexPath.item)
-                collectionView.insertItems(at: [newIndexPath])
-
-                let fromIndexPath = IndexPath(item: newIndexPath.item + 1, section: 0)
-                let toIndexPath = IndexPath(item: layerManager.allLayers().count - 1, section: 0)
-                reconfigureCells(from: fromIndexPath, to: toIndexPath)
+                _ = layerManager.insertLayer(newLayer, at: indexPath.item)
+                collectionView.insertItems(at: [indexPath])
+                reconfigureCells()
             }),
             UIAction(title: "Удалить", image: UIImage(systemName: "xmark"), attributes: .destructive, handler: { [weak self] _ in
                 guard let self else {
@@ -132,14 +129,19 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
                 if layers.count == 1 {
                     self.collectionView.reloadData()
                 } else {
-                    let toIndexPath = IndexPath(item: layers.count - 1, section: 0)
                     collectionView.deleteItems(at: [indexPath])
-                    reconfigureCells(from: indexPath, to: toIndexPath)
+                    reconfigureCells()
                 }
             })
         ])
 
         return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        layerManager.selectLayer(at: indexPath.item)
+        onDismiss?()
+        dismiss(animated: true)
     }
 
     func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
@@ -148,11 +150,7 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
 
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         layerManager.moveLayers(from: sourceIndexPath.item, to: destinationIndexPath.item)
-
-        let source = min(sourceIndexPath, destinationIndexPath)
-        let destination = max(sourceIndexPath, destinationIndexPath)
-
-        reconfigureCells(from: source, to: destination)
+        reconfigureCells()
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -167,11 +165,10 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
         return Constants.spacing
     }
 
-    // Reconfigure all cells between source and destination to invalidate their menus
-    private func reconfigureCells(from fromIndexPath: IndexPath, to toIndexPath: IndexPath) {
+    private func reconfigureCells() {
         let indexPaths = stride(
-            from: fromIndexPath.item,
-            through: toIndexPath.item,
+            from: 0,
+            to: layerManager.allLayers().count,
             by: 1
         ).map { IndexPath(item: $0, section: 0) }
 

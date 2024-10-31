@@ -102,7 +102,7 @@ final class MainPresenter {
         let background = CALayer()
         background.bounds = canvas
         background.shouldRasterize = true
-        background.contents = UIImage(named: "canvas")?.cgImage
+        background.contents = UIImage.canvas.cgImage
 
         var images = [UIImage]()
         let renderer = UIGraphicsImageRenderer(bounds: canvas)
@@ -159,7 +159,7 @@ final class MainPresenter {
             canRemoveLayer: layers.count > 1 || layers.first?.hasLines() == true,
             tool: state.tool,
             color: state.color,
-            layer: layerManager.lastLayer(),
+            layer: layerManager.currentLayer(),
             previousLayer: layerManager.previousLayer()
         )
 

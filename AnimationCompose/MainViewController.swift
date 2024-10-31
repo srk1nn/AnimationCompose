@@ -104,11 +104,11 @@ final class MainViewController: UIViewController {
 
         alert.addAction(action)
 
-        present(alert, animated: true) {
-            if isAnimating {
-                self.mainView.animationImageView.stopAnimating()
-            }
+        if isAnimating {
+            self.mainView.animationImageView.stopAnimating()
         }
+
+        present(alert, animated: true)
     }
 
     // Shows only when animating
