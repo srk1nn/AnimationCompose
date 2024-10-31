@@ -24,8 +24,6 @@
 		4F90AA0B2CD11D4400FA32F9 /* GIFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F90AA0A2CD11D4400FA32F9 /* GIFGenerator.swift */; };
 		4F90AA0F2CD135A700FA32F9 /* AnimationSpeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F90AA0E2CD135A700FA32F9 /* AnimationSpeedView.swift */; };
 		4F90AA132CD1733900FA32F9 /* AnimaticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F90AA122CD1733900FA32F9 /* AnimaticViewController.swift */; };
-		4FFE78EF2CD3D6F70085C10A /* MetalDrawingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFE78EE2CD3D6F70085C10A /* MetalDrawingView.swift */; };
-		4FFE78F12CD3DB4F0085C10A /* drawing.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4FFE78F02CD3DB4F0085C10A /* drawing.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,8 +46,6 @@
 		4F90AA0A2CD11D4400FA32F9 /* GIFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFGenerator.swift; sourceTree = "<group>"; };
 		4F90AA0E2CD135A700FA32F9 /* AnimationSpeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSpeedView.swift; sourceTree = "<group>"; };
 		4F90AA122CD1733900FA32F9 /* AnimaticViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimaticViewController.swift; sourceTree = "<group>"; };
-		4FFE78EE2CD3D6F70085C10A /* MetalDrawingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDrawingView.swift; sourceTree = "<group>"; };
-		4FFE78F02CD3DB4F0085C10A /* drawing.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = drawing.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,8 +84,6 @@
 				4F90AA082CD0D1D800FA32F9 /* Collection+Safe.swift */,
 				4F90AA022CCFCB6000FA32F9 /* DrawingGestureRecognizer.swift */,
 				4F90AA042CCFD3FD00FA32F9 /* DrawingView.swift */,
-				4FFE78EE2CD3D6F70085C10A /* MetalDrawingView.swift */,
-				4FFE78F02CD3DB4F0085C10A /* drawing.metal */,
 				4F90AA0E2CD135A700FA32F9 /* AnimationSpeedView.swift */,
 				4F90AA122CD1733900FA32F9 /* AnimaticViewController.swift */,
 				4F2BAF7A2CCF92EA0058CA57 /* MainView.swift */,
@@ -181,13 +175,11 @@
 				4F2BAF6B2CCF92D50058CA57 /* MainViewController.swift in Sources */,
 				4F2BAF7B2CCF92EA0058CA57 /* MainView.swift in Sources */,
 				4F90AA052CCFD3FD00FA32F9 /* DrawingView.swift in Sources */,
-				4FFE78EF2CD3D6F70085C10A /* MetalDrawingView.swift in Sources */,
 				4F90AA092CD0D1D800FA32F9 /* Collection+Safe.swift in Sources */,
 				4F90AA032CCFCB6000FA32F9 /* DrawingGestureRecognizer.swift in Sources */,
 				4F90AA132CD1733900FA32F9 /* AnimaticViewController.swift in Sources */,
 				4F039D162CCFB65B00ADCEE9 /* Buttons.swift in Sources */,
 				4F90AA072CCFEA6300FA32F9 /* Models.swift in Sources */,
-				4FFE78F12CD3DB4F0085C10A /* drawing.metal in Sources */,
 				4F90AA0B2CD11D4400FA32F9 /* GIFGenerator.swift in Sources */,
 				4F90AA0F2CD135A700FA32F9 /* AnimationSpeedView.swift in Sources */,
 				4F3E8D542CD35A6D00940CEB /* LayerManager.swift in Sources */,

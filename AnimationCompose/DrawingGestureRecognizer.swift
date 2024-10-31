@@ -23,14 +23,14 @@ final class DrawingGestureRecognizer: UIGestureRecognizer {
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
-        guard
-            let actualTouch = touches.first,
-            let view = actualTouch.view,
-            view.bounds.contains(actualTouch.location(in: view))
-        else {
-            state = .cancelled
-            return
-        }
+//        guard
+//            let actualTouch = touches.first,
+//            let view = actualTouch.view,
+//            view.bounds.contains(actualTouch.location(in: view))
+//        else {
+//            state = .cancelled
+//            return
+//        }
 
         if add(touches: touches, event: event) {
             if state == .began {
@@ -65,11 +65,17 @@ final class DrawingGestureRecognizer: UIGestureRecognizer {
             return false
         }
 
-        let coalescedTouches = event.coalescedTouches(for: touch) ?? []
-
-        coalescedTouches.forEach {
-            let location = $0.preciseLocation(in: view)
-            stroke.points.append(location)
+        event.coalescedTouches(for: touch)?.forEach {
+            if let lastPoint = stroke.points.last {
+                let location = $0.preciseLocation(in: view)
+                let distance = hypot(location.x - lastPoint.x, location.y - lastPoint.y)
+                if distance >= 0.01 {
+                    stroke.points.append(location)
+                }
+            } else {
+                let location = $0.preciseLocation(in: view)
+                stroke.points.append(location)
+            }
         }
 
         return true

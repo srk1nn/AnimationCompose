@@ -53,54 +53,16 @@ final class DrawingView: UIView {
             return
         }
 
+        context.move(to: points[0])
+        context.addLines(between: points)
         context.setAlpha(settings.alpha)
         context.setLineCap(.round)
         context.setLineWidth(settings.width)
         context.setShadow(offset: .zero, blur: settings.blur ?? 0, color: settings.color.cgColor)
         context.setStrokeColor(settings.color.cgColor)
         context.setBlendMode(settings.blendMode)
-
-        context.move(to: points[0])
-        context.addLines(between: points)
         context.strokePath()
-
-//        realDraw(points)
-
-//        if linePoints.count > 1 {
-//            context.move(to: linePoints.first!)
-//            context.addLines(between: linePoints)
-//            context.setAlpha(settings.alpha)
-//            context.setLineCap(.round)
-//            context.setLineWidth(settings.width)
-//            context.setShadow(offset: .zero, blur: settings.blur ?? 0, color: settings.color.cgColor)
-//            context.setStrokeColor(settings.color.cgColor)
-//            context.setBlendMode(settings.blendMode)
-//            context.strokePath()
-//        }
     }
-
-//    private func realDraw(_ points: [CGPoint]) {
-//        guard points.count > 1 else { return }
-//
-//        let path = UIBezierPath()
-//        path.lineWidth = 8
-//
-//        path.move(to: points[0])
-//
-//        for i in 1..<points.count {
-//            let midPoint = CGPoint(
-//                x: (points[i - 1].x + points[i].x) / 2,
-//                y: (points[i - 1].y + points[i].y) / 2
-//            )
-//            path.addQuadCurve(to: midPoint, controlPoint: points[i - 1])
-//        }
-//
-//        if let lastPoint = points.last {
-//            path.addLine(to: lastPoint)
-//        }
-//
-//        path.stroke(with: .multiply, alpha: 0.4)
-//    }
 
     private func drawablePoints(from points: [CGPoint]) -> [CGPoint] {
         let drawable: [CGPoint]
@@ -111,9 +73,10 @@ final class DrawingView: UIView {
             drawable = points
         }
 
-        return filterNearest(points: drawable, minimumDistance: 0.01)
+        return drawable
     }
 
+    // filtering in DrawableGestureRecognizer
     private func filterNearest(points: [CGPoint], minimumDistance: CGFloat) -> [CGPoint] {
         guard !points.isEmpty else { return [] }
 
