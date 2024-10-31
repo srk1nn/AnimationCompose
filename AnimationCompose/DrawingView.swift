@@ -53,14 +53,21 @@ final class DrawingView: UIView {
             return
         }
 
-        context.move(to: points[0])
-        context.addLines(between: points)
         context.setAlpha(settings.alpha)
         context.setLineCap(.round)
         context.setLineWidth(settings.width)
         context.setShadow(offset: .zero, blur: settings.blur ?? 0, color: settings.color.cgColor)
         context.setStrokeColor(settings.color.cgColor)
         context.setBlendMode(settings.blendMode)
+
+        context.move(to: points[0])
+        for i in 1..<points.count {
+            let mid = CGPoint(
+                x: (points[i - 1].x + points[i].x) / 2,
+                y: (points[i - 1].y + points[i].y) / 2
+            )
+            context.addQuadCurve(to: mid, control: points[i - 1])
+        }
         context.strokePath()
     }
 
@@ -74,24 +81,6 @@ final class DrawingView: UIView {
         }
 
         return drawable
-    }
-
-    // filtering in DrawableGestureRecognizer
-    private func filterNearest(points: [CGPoint], minimumDistance: CGFloat) -> [CGPoint] {
-        guard !points.isEmpty else { return [] }
-
-        var filteredPoints = [points[0]]
-
-        for point in points {
-            if let lastPoint = filteredPoints.last {
-                let distance = hypot(point.x - lastPoint.x, point.y - lastPoint.y)
-                if distance >= minimumDistance {
-                    filteredPoints.append(point)
-                }
-            }
-        }
-
-        return filteredPoints
     }
 
     private func convertPoint(_ point: CGPoint, from sourceRect: CGRect, to destinationRect: CGRect) -> CGPoint {
