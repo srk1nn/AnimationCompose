@@ -8,10 +8,29 @@
 import UIKit
 
 final class SecondaryButton: UIButton {
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let activity = UIActivityIndicatorView(style: .large)
+        activity.hidesWhenStopped = true
+        activity.frame = bounds
+        activity.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        addSubview(activity)
+        return activity
+    }()
+
     override var isEnabled: Bool {
         didSet {
             tintColor = isEnabled ? .details : .disabled
         }
+    }
+
+    func showActivity() {
+        tintColor = .clear
+        activityIndicator.startAnimating()
+    }
+
+    func hideActivity() {
+        tintColor = isEnabled ? .details : .disabled
+        activityIndicator.stopAnimating()
     }
 }
 

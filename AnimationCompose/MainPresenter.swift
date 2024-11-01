@@ -11,7 +11,6 @@ enum Tool {
     case pencil
     case brush
     case eraser
-    case instruments
 }
 
 enum Animation {
@@ -34,6 +33,7 @@ final class MainPresenter {
     private let gifGenerator = GIFGenerator()
     private let workerQueue = DispatchQueue(label: "animation.compose.worker", qos: .userInitiated, attributes: .concurrent)
     private var animationGenerationWork: DispatchWorkItem?
+    private var gifGenerationWork: DispatchWorkItem?
 
     private var state = State(
         animation: .idle,
@@ -47,18 +47,16 @@ final class MainPresenter {
     }
 
     func invalidateState() {
-        cancelAnimationGeneration()
+        cancelGenerationWorks()
         updateUI()
     }
 
     @objc func handleDrawing(_ sender: DrawingGestureRecognizer) {
-        cancelAnimationGeneration()
+        cancelGenerationWorks()
 
         switch sender.state {
         case .began:
-            lineSettings().map {
-                layerManager.startLine(settings: $0, stroke: sender.stroke)
-            }
+            layerManager.startLine(settings: lineSettings(), stroke: sender.stroke)
         case .cancelled, .ended:
             layerManager.endLine()
         default:
@@ -70,7 +68,7 @@ final class MainPresenter {
 
     func undo() {
         if layerManager.canUndo() {
-            cancelAnimationGeneration()
+            cancelGenerationWorks()
             layerManager.undo()
             updateUI()
         }
@@ -78,45 +76,47 @@ final class MainPresenter {
 
     func redo() {
         if layerManager.canRedo() {
-            cancelAnimationGeneration()
+            cancelGenerationWorks()
             layerManager.redo()
             updateUI()
         }
     }
 
     func select(tool: Tool) {
-        cancelAnimationGeneration()
+        cancelGenerationWorks()
         state.tool = tool
         updateUI()
     }
 
     func select(color: UIColor) {
-        cancelAnimationGeneration()
+        cancelGenerationWorks()
         state.color = color
         updateUI()
     }
 
     func addLayer() {
-        cancelAnimationGeneration()
+        cancelGenerationWorks()
+        let success = layerManager.addLayer()
+        updateUI()
 
-        if layerManager.addLayer() {
-            updateUI()
+        if !success {
+            view?.showAlert(title: "Ошибка", message: "Превышено максимальное количество кадров")
         }
     }
 
     func removeLayer() {
-        cancelAnimationGeneration()
+        cancelGenerationWorks()
         layerManager.removeLayer()
         updateUI()
     }
 
     func play(canvas: CGRect) {
+        let layers = layerManager.allLayers()
         var workItem: DispatchWorkItem?
 
         workItem = DispatchWorkItem { [self] in
             defer { workItem = nil }
 
-            let layers = layerManager.allLayers()
             var images = [UIImage]()
             images.reserveCapacity(layers.count)
 
@@ -128,13 +128,13 @@ final class MainPresenter {
                 images.append(image)
             }
 
-            guard workItem?.isCancelled == false else {
-                return
-            }
-
             DispatchQueue.main.async { [self] in
-                state.animation = .animating(images)
-                updateUI()
+                let wasCancelled = animationGenerationWork?.isCancelled
+                animationGenerationWork = nil
+                if wasCancelled == false {
+                    state.animation = .animating(images)
+                    updateUI()
+                }
             }
         }
 
@@ -146,7 +146,7 @@ final class MainPresenter {
     }
 
     func pause() {
-        cancelAnimationGeneration()
+        cancelGenerationWorks()
         state.animation = .idle
         updateUI()
     }
@@ -157,24 +157,95 @@ final class MainPresenter {
             return
         }
 
-        do {
-            let url = FileManager.default.temporaryDirectory.appendingPathComponent("AnimationCompose.gif")
-            try gifGenerator.generate(at: url, frames: images, animationSpeed: state.animationSpeed)
-            view?.showShare(item: url)
-        } catch {
-            view?.showAlert(title: "Ошибка", message: error.localizedDescription)
+        let animationSpeed = state.animationSpeed
+        var workItem: DispatchWorkItem?
+
+        workItem = DispatchWorkItem { [self] in
+            defer { workItem = nil }
+            
+            let result: Result<URL, Error>
+
+            do {
+                let url = FileManager.default.temporaryDirectory.appendingPathComponent("AnimationCompose.gif")
+                try gifGenerator.generate(at: url, frames: images, animationSpeed: animationSpeed)
+                result = .success(url)
+            } catch {
+                result = .failure(error)
+            }
+
+            DispatchQueue.main.async { [self] in
+                let wasCancelled = gifGenerationWork?.isCancelled
+                gifGenerationWork = nil
+                if wasCancelled == false {
+                    updateUI()
+                    switch result {
+                    case .success(let url):
+                        view?.showShare(item: url)
+                    case .failure(let error):
+                        view?.showAlert(title: "Ошибка", message: error.localizedDescription)
+                    }
+                }
+            }
+        }
+
+        if let workItem {
+            gifGenerationWork = workItem
+            workerQueue.async(execute: workItem)
+            updateUI()
         }
     }
 
     func updateSpeed(_ animationSpeed: AnimationSpeed) {
-        cancelAnimationGeneration()
+        cancelGenerationWorks()
         state.animationSpeed = animationSpeed
         updateUI()
     }
 
-    func cancelAnimationGeneration() {
+    func generateBackgroundLayers(in canvas: CGRect, count: Int) {
+        let center = CGPoint(x: canvas.midX, y: canvas.midY)
+
+        let maxRadius = Int(hypot(canvas.width / 2, canvas.height / 2))
+        let initialRadius = 10
+        let radiusStep = 20
+        var radius = 10
+        var additionalRadius = -(maxRadius / 2)
+
+        struct Radius: Hashable {
+            let radius: Int
+            let additionalRadius: Int
+        }
+
+        var layerByRadius = [Radius: Layer]()
+        var layers = [Layer]()
+
+        for _ in 0..<count {
+            let radii = Radius(radius: radius, additionalRadius: additionalRadius)
+            let cachedLayer = layerByRadius[radii]
+            let layer = cachedLayer.map { Layer(layer: $0) } ?? layerCircles(center: center, radius: additionalRadius > 0 ? [radius, additionalRadius] : [radius])
+            layerByRadius[radii] = layer
+
+            layers.append(layer)
+
+            radius = radius > maxRadius ? initialRadius : radius + radiusStep
+            additionalRadius = additionalRadius > maxRadius ? initialRadius : additionalRadius + radiusStep
+        }
+
+        // TODO: подумать куда вставлять
+        let success = layerManager.insertLayers(layers)
+
+        if success {
+            updateUI()
+        } else {
+            view?.showAlert(title: "Ошибка", message: "Превышено максимальное количество кадров")
+        }
+    }
+
+    func cancelGenerationWorks() {
         animationGenerationWork?.cancel()
         animationGenerationWork = nil
+
+        gifGenerationWork?.cancel()
+        gifGenerationWork = nil
     }
 
     // MARK: - Private
@@ -185,6 +256,7 @@ final class MainPresenter {
         let viewModel = MainViewModel(
             canPlay: layers.count > 1,
             isGeneratingAnimation: animationGenerationWork != nil,
+            isGeneratingGIF: gifGenerationWork != nil,
             animation: state.animation,
             animationSpeed: state.animationSpeed,
             canUndo: layerManager.canUndo(),
@@ -199,7 +271,7 @@ final class MainPresenter {
         view?.apply(viewModel)
     }
 
-    private func lineSettings() -> Line.Settings? {
+    private func lineSettings() -> Line.Settings {
         switch state.tool {
         case .pencil:
             Line.Settings(width: 3, alpha: 1, blur: nil, blendMode: .normal, color: state.color)
@@ -207,8 +279,27 @@ final class MainPresenter {
             Line.Settings(width: 8, alpha: 0.5, blur: 8, blendMode: .multiply, color: state.color)
         case .eraser:
             Line.Settings(width: 12, alpha: 1, blur: nil, blendMode: .clear, color: .clear)
-        default:
-            nil
+        }
+    }
+
+    private func layerCircles(center: CGPoint, radius: [Int]) -> Layer {
+        let settings = lineSettings()
+
+        let lines = radius
+            .map { generateCirclePoints(center: center, radius: CGFloat($0)) }
+            .map { Stroke(points: $0) }
+            .map { Line(stroke: $0, settings: settings) }
+
+        return Layer(lines: lines)
+    }
+
+    private func generateCirclePoints(center: CGPoint, radius: CGFloat) -> [CGPoint] {
+        return stride(from: 0, through: 360, by: 5).map { angle in
+            let radians = angle * .pi / 180
+            return CGPoint(
+                x: center.x + radius * cos(radians),
+                y: center.y + radius * sin(radians)
+            )
         }
     }
 }

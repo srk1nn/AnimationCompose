@@ -27,6 +27,8 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        collectionView.isPagingEnabled = false
+
         collectionView.contentInset = UIEdgeInsets(
             top: Constants.padding,
             left: Constants.padding,
@@ -58,6 +60,26 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
             self?.handleShowTip(animated: true)
         }
     }
+
+    // TODO: подумать
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//
+//        if isTipShown() {
+//            view.layoutIfNeeded()
+//            let indexPath = IndexPath(item: layerManager.index(), section: 0)
+//            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+//        }
+//    }
+//
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//
+//        if !isTipShown() {
+//            let indexPath = IndexPath(item: layerManager.index(), section: 0)
+//            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: true)
+//        }
+//    }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -114,9 +136,14 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
                 }
 
                 let newLayer = Layer(layer: layer)
-                _ = layerManager.insertLayer(newLayer, at: indexPath.item)
-                collectionView.insertItems(at: [indexPath])
-                reconfigureCells()
+                let success = layerManager.insertLayer(newLayer, at: indexPath.item)
+
+                if success {
+                    collectionView.insertItems(at: [indexPath])
+                    reconfigureCells()
+                } else {
+                    showAlert(title: "Ошибка", message: "Превышено максимальное количество кадров")
+                }
             }),
             UIAction(title: "Удалить", image: UIImage(systemName: "xmark"), attributes: .destructive, handler: { [weak self] _ in
                 guard let self else {
@@ -175,8 +202,12 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
         collectionView.reconfigureItems(at: indexPaths)
     }
 
+    private func isTipShown() -> Bool {
+        UserDefaults.standard.bool(forKey: Constants.showTipKey)
+    }
+
     private func shouldShowTip(for indexPath: IndexPath) -> Bool {
-        indexPath.item == 0 && !UserDefaults.standard.bool(forKey: Constants.showTipKey)
+        indexPath.item == 0 && !isTipShown()
     }
 
     private func handleShowTip(animated: Bool = false) {
@@ -191,6 +222,13 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
             cell?.tipView.isHidden = true
         }
         UserDefaults.standard.setValue(true, forKey: Constants.showTipKey)
+    }
+
+    private func showAlert(title: String, message: String? = nil) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default)
+        alert.addAction(action)
+        present(alert, animated: true)
     }
 
     private enum Constants {

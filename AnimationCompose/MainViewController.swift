@@ -11,6 +11,7 @@ import SwiftUI
 struct MainViewModel {
     let canPlay: Bool
     let isGeneratingAnimation: Bool
+    let isGeneratingGIF: Bool
     let animation: Animation
     let animationSpeed: AnimationSpeed
     let canUndo: Bool
@@ -58,8 +59,7 @@ final class MainViewController: UIViewController {
 
             [mainView.pencilButton,
              mainView.brushButton,
-             mainView.eraseButton,
-             mainView.instrumentsButton].forEach { $0?.isSelected = false }
+             mainView.eraseButton].forEach { $0?.isSelected = false }
 
             switch viewModel.tool {
             case .pencil:
@@ -68,8 +68,6 @@ final class MainViewController: UIViewController {
                 mainView.brushButton.isSelected = true
             case .eraser:
                 mainView.eraseButton.isSelected = true
-            case .instruments:
-                mainView.instrumentsButton.isSelected = true
             }
 
             mainView.colorButton.tintColor = viewModel.color
@@ -77,23 +75,25 @@ final class MainViewController: UIViewController {
             mainView.previousDrawingView.drawingLayer = viewModel.previousLayer
             mainView.drawingView.drawingLayer = viewModel.layer
 
-            if viewModel.isGeneratingAnimation {
-                mainView.playButton.alpha = 0
-                mainView.activityIndicator.startAnimating()
-            } else {
-                mainView.activityIndicator.stopAnimating()
-                mainView.playButton.alpha = 1
-            }
-
             stopAnimating()
 
         case .animating(let images):
-            mainView.playButton.alpha = 1
             mainView.playButton.isEnabled = false
             mainView.pauseButton.isEnabled = true
-            mainView.activityIndicator.stopAnimating()
 
             startAnimating(images: images, animationSpeed: viewModel.animationSpeed)
+        }
+
+        if viewModel.isGeneratingAnimation {
+            mainView.playButton.showActivity()
+        } else {
+            mainView.playButton.hideActivity()
+        }
+
+        if viewModel.isGeneratingGIF {
+            mainView.shareButton.showActivity()
+        } else {
+            mainView.shareButton.hideActivity()
         }
 
         animationSpeed = viewModel.animationSpeed
@@ -157,6 +157,28 @@ final class MainViewController: UIViewController {
 
     @IBAction private func eraseTapped(_ sender: UIButton) {
         presenter.select(tool: .eraser)
+    }
+
+    @IBAction func instrumentsTapped(_ sender: UIButton) {
+        presenter.invalidateState()
+
+        let alert = UIAlertController(title: "Создание фона", message: "Введите количество кадров", preferredStyle: .alert)
+        alert.addTextField {
+            $0.keyboardType = .numberPad
+        }
+
+        let create = UIAlertAction(title: "Создать", style: .default) { [weak alert] _ in
+            let textField = alert?.textFields?.first
+            let count = textField?.text.flatMap { Int($0) }
+            count.map { self.presenter.generateBackgroundLayers(in: self.mainView.canvasView.bounds, count: $0) }
+        }
+
+        let cancel = UIAlertAction(title: "Отмена", style: .cancel)
+
+        alert.addAction(create)
+        alert.addAction(cancel)
+
+        present(alert, animated: true)
     }
 
     // MARK: - Colors Selection
@@ -247,6 +269,8 @@ final class MainViewController: UIViewController {
         guard var animationSpeed else {
             return
         }
+
+        presenter.invalidateState()
 
         mainView.animationImageView.stopAnimating()
 

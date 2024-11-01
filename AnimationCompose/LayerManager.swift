@@ -13,6 +13,7 @@ final class LayerManager {
     private let undoManager = UndoManager()
     private var layers = [Layer(lines: [])]
     private var currentIndex = 0
+    private let layersLimit = Int.max
 
     // MARK: - Lines
 
@@ -31,7 +32,7 @@ final class LayerManager {
 
     /// This method may fail, due to number of layers limit
     func addLayer() -> Bool {
-        if layers.count == Int.max {
+        if layers.count == layersLimit {
             // Clause: Максимальное количество кадров не может превышать Int.max
             return false
         }
@@ -47,7 +48,7 @@ final class LayerManager {
 
     /// This method may fail, due to number of layers limit
     func insertLayer(_ layer: Layer, at index: Int) -> Bool {
-        if layers.count == Int.max {
+        if layers.count == layersLimit {
             return false
         }
 
@@ -56,6 +57,22 @@ final class LayerManager {
             if currentIndex >= index {
                 currentIndex += 1
             }
+        }
+
+        return true
+    }
+
+    /// This method may fail, due to number of layers limit
+    func insertLayers(_ layers: [Layer]) -> Bool {
+        let capacity = layersLimit - self.layers.count
+
+        if layers.count > capacity {
+            return false
+        }
+
+        registerUndo {
+            self.layers.insert(contentsOf: layers, at: currentIndex)
+            currentIndex += layers.count
         }
 
         return true
@@ -120,6 +137,10 @@ final class LayerManager {
 
     func allLayers() -> [Layer] {
         return layers
+    }
+
+    func index() -> Int {
+        return currentIndex
     }
 
     // MARK: - Undo & Redo

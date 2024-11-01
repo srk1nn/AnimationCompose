@@ -245,6 +245,9 @@
                                         <color key="tintColor" name="details"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="instruments"/>
+                                        <connections>
+                                            <action selector="instrumentsTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Z7p-jS-6PB"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="09S-dx-OTw" userLabel="Color Button" customClass="BorderButton" customModule="AnimationCompose" customModuleProvider="target">
                                         <rect key="frame" x="192" y="0.0" width="32" height="32"/>
@@ -342,20 +345,15 @@
                                     <constraint firstItem="5OR-fu-VDO" firstAttribute="leading" secondItem="YDP-Dd-F0l" secondAttribute="leading" constant="16" id="NEo-JN-c4z"/>
                                 </constraints>
                             </view>
-                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="Zn2-KK-U9N">
-                                <rect key="frame" x="342.66666666666669" y="72" width="37" height="37"/>
-                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="main"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="hfh-Uo-0kY" secondAttribute="bottom" constant="8" id="2mz-5I-AAq"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="lQQ-jQ-olf" secondAttribute="trailing" constant="16" id="4Q9-6F-Gxw"/>
-                            <constraint firstItem="Zn2-KK-U9N" firstAttribute="centerY" secondItem="5AR-Vu-7eE" secondAttribute="centerY" id="5CW-Cl-itA"/>
                             <constraint firstItem="OrC-YC-B6j" firstAttribute="bottom" secondItem="Z2f-WL-3Fp" secondAttribute="bottom" id="7Zn-I8-haq"/>
                             <constraint firstItem="YDP-Dd-F0l" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="7gh-Yu-zkw"/>
                             <constraint firstItem="lQQ-jQ-olf" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="BiT-nZ-GKc"/>
-                            <constraint firstItem="Zn2-KK-U9N" firstAttribute="centerX" secondItem="5AR-Vu-7eE" secondAttribute="centerX" id="DbV-ok-hiq"/>
                             <constraint firstItem="1MX-Ep-JZL" firstAttribute="trailing" secondItem="Z2f-WL-3Fp" secondAttribute="trailing" id="Gny-sb-xfj"/>
                             <constraint firstItem="1MX-Ep-JZL" firstAttribute="bottom" secondItem="Z2f-WL-3Fp" secondAttribute="bottom" id="HjS-qB-dTF"/>
                             <constraint firstItem="Z2f-WL-3Fp" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="NEG-am-vJF"/>
@@ -376,7 +374,6 @@
                             <constraint firstItem="OrC-YC-B6j" firstAttribute="top" secondItem="Z2f-WL-3Fp" secondAttribute="top" id="y1f-D7-Lth"/>
                         </constraints>
                         <connections>
-                            <outlet property="activityIndicator" destination="Zn2-KK-U9N" id="jws-8V-Nhj"/>
                             <outlet property="addLayerButton" destination="EA9-s5-fUw" id="qTv-TB-tKc"/>
                             <outlet property="animationImageView" destination="OrC-YC-B6j" id="dY1-06-h9H"/>
                             <outlet property="blackColorButton" destination="UmJ-8K-7bs" id="Vlc-zg-lo9"/>
