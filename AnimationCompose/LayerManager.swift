@@ -62,16 +62,7 @@ final class LayerManager {
     }
 
     func removeLayer() {
-        registerUndo {
-            layers.remove(at: currentIndex)
-
-            if layers.isEmpty {
-                assert(currentIndex == 0)
-                layers.append(Layer(lines: []))
-            } else {
-                currentIndex -= 1
-            }
-        }
+        removeLayer(at: currentIndex)
     }
 
     func removeLayer(at index: Int) {

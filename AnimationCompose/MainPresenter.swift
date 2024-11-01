@@ -30,7 +30,10 @@ final class MainPresenter {
     weak var view: MainViewController?
 
     private let layerManager = LayerManager.shared
+    private let renderer = Renderer()
     private let gifGenerator = GIFGenerator()
+    private let workerQueue = DispatchQueue(label: "animation.compose.worker", qos: .userInitiated, attributes: .concurrent)
+    private var animationGenerationWork: DispatchWorkItem?
 
     private var state = State(
         animation: .idle,
@@ -44,10 +47,13 @@ final class MainPresenter {
     }
 
     func invalidateState() {
+        cancelAnimationGeneration()
         updateUI()
     }
 
     @objc func handleDrawing(_ sender: DrawingGestureRecognizer) {
+        cancelAnimationGeneration()
+
         switch sender.state {
         case .began:
             lineSettings().map {
@@ -58,12 +64,13 @@ final class MainPresenter {
         default:
             break
         }
-        
+
         updateUI()
     }
 
     func undo() {
         if layerManager.canUndo() {
+            cancelAnimationGeneration()
             layerManager.undo()
             updateUI()
         }
@@ -71,56 +78,75 @@ final class MainPresenter {
 
     func redo() {
         if layerManager.canRedo() {
+            cancelAnimationGeneration()
             layerManager.redo()
             updateUI()
         }
     }
 
     func select(tool: Tool) {
+        cancelAnimationGeneration()
         state.tool = tool
         updateUI()
     }
 
     func select(color: UIColor) {
+        cancelAnimationGeneration()
         state.color = color
         updateUI()
     }
 
     func addLayer() {
+        cancelAnimationGeneration()
+
         if layerManager.addLayer() {
             updateUI()
         }
     }
 
     func removeLayer() {
+        cancelAnimationGeneration()
         layerManager.removeLayer()
         updateUI()
     }
 
     func play(canvas: CGRect) {
-        let worker = DrawingView(frame: canvas)
-        let background = CALayer()
-        background.bounds = canvas
-        background.shouldRasterize = true
-        background.contents = UIImage.canvas.cgImage
+        var workItem: DispatchWorkItem?
 
-        var images = [UIImage]()
-        let renderer = UIGraphicsImageRenderer(bounds: canvas)
+        workItem = DispatchWorkItem { [self] in
+            defer { workItem = nil }
 
-        layerManager.allLayers().forEach {
-            worker.drawingLayer = $0
-            let image = renderer.image { context in
-                background.render(in: context.cgContext)
-                worker.layer.render(in: context.cgContext)
+            let layers = layerManager.allLayers()
+            var images = [UIImage]()
+            images.reserveCapacity(layers.count)
+
+            for layer in layers {
+                guard workItem?.isCancelled == false else {
+                    return
+                }
+                let image = renderer.renderImage(layer: layer, background: .canvas, canvas: canvas)
+                images.append(image)
             }
-            images.append(image)
+
+            guard workItem?.isCancelled == false else {
+                return
+            }
+
+            DispatchQueue.main.async { [self] in
+                state.animation = .animating(images)
+                updateUI()
+            }
         }
 
-        state.animation = .animating(images)
-        updateUI()
+        if let workItem {
+            animationGenerationWork = workItem
+            workerQueue.async(execute: workItem)
+            updateUI()
+        }
     }
 
     func pause() {
+        cancelAnimationGeneration()
         state.animation = .idle
         updateUI()
     }
@@ -141,8 +167,14 @@ final class MainPresenter {
     }
 
     func updateSpeed(_ animationSpeed: AnimationSpeed) {
+        cancelAnimationGeneration()
         state.animationSpeed = animationSpeed
         updateUI()
+    }
+
+    func cancelAnimationGeneration() {
+        animationGenerationWork?.cancel()
+        animationGenerationWork = nil
     }
 
     // MARK: - Private
@@ -152,6 +184,7 @@ final class MainPresenter {
 
         let viewModel = MainViewModel(
             canPlay: layers.count > 1,
+            isGeneratingAnimation: animationGenerationWork != nil,
             animation: state.animation,
             animationSpeed: state.animationSpeed,
             canUndo: layerManager.canUndo(),
@@ -171,7 +204,7 @@ final class MainPresenter {
         case .pencil:
             Line.Settings(width: 3, alpha: 1, blur: nil, blendMode: .normal, color: state.color)
         case .brush:
-            Line.Settings(width: 8, alpha: 0.4, blur: 8, blendMode: .multiply, color: state.color)
+            Line.Settings(width: 8, alpha: 0.5, blur: 8, blendMode: .multiply, color: state.color)
         case .eraser:
             Line.Settings(width: 12, alpha: 1, blur: nil, blendMode: .clear, color: .clear)
         default:

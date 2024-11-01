@@ -20,6 +20,7 @@ final class MainView: UIView {
     @IBOutlet weak var pauseButton: SecondaryButton!
     @IBOutlet weak var playButton: SecondaryButton!
 
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var canvasView: UIImageView!
     @IBOutlet weak var animationImageView: UIImageView!
     @IBOutlet weak var previousDrawingView: DrawingView!

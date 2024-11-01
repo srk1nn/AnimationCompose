@@ -24,6 +24,7 @@
 		4F90AA0B2CD11D4400FA32F9 /* GIFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F90AA0A2CD11D4400FA32F9 /* GIFGenerator.swift */; };
 		4F90AA0F2CD135A700FA32F9 /* AnimationSpeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F90AA0E2CD135A700FA32F9 /* AnimationSpeedView.swift */; };
 		4F90AA132CD1733900FA32F9 /* AnimaticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F90AA122CD1733900FA32F9 /* AnimaticViewController.swift */; };
+		4FFE79252CD404590085C10A /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFE79242CD404590085C10A /* Renderer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		4F90AA0A2CD11D4400FA32F9 /* GIFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFGenerator.swift; sourceTree = "<group>"; };
 		4F90AA0E2CD135A700FA32F9 /* AnimationSpeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSpeedView.swift; sourceTree = "<group>"; };
 		4F90AA122CD1733900FA32F9 /* AnimaticViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimaticViewController.swift; sourceTree = "<group>"; };
+		4FFE79242CD404590085C10A /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +93,7 @@
 				4F039D132CCFB36100ADCEE9 /* MainPresenter.swift */,
 				4F3E8D532CD35A6D00940CEB /* LayerManager.swift */,
 				4F90AA0A2CD11D4400FA32F9 /* GIFGenerator.swift */,
+				4FFE79242CD404590085C10A /* Renderer.swift */,
 				4F90AA062CCFEA6300FA32F9 /* Models.swift */,
 				4F2BAF6C2CCF92D50058CA57 /* Main.storyboard */,
 				4F2BAF6F2CCF92D70058CA57 /* Assets.xcassets */,
@@ -184,6 +187,7 @@
 				4F90AA0F2CD135A700FA32F9 /* AnimationSpeedView.swift in Sources */,
 				4F3E8D542CD35A6D00940CEB /* LayerManager.swift in Sources */,
 				4F2BAF672CCF92D40058CA57 /* AppDelegate.swift in Sources */,
+				4FFE79252CD404590085C10A /* Renderer.swift in Sources */,
 				4F2BAF692CCF92D40058CA57 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

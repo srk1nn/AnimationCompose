@@ -8,7 +8,6 @@
 import UIKit
 
 final class DrawingView: UIView {
-
     var drawingLayer: Layer? {
         didSet {
             if oldValue !== drawingLayer || drawingLayer?.shouldRedraw ?? false {
@@ -18,6 +17,8 @@ final class DrawingView: UIView {
     }
 
     var relativeToCanvas: CGRect?
+
+    private let renderer = Renderer()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -35,41 +36,18 @@ final class DrawingView: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-        drawingLayer?.drawings().forEach {
-            draw(line: $0)
+        drawingLayer?.drawings().forEach { line in
+            guard let context = UIGraphicsGetCurrentContext() else {
+                return
+            }
+
+            let points = drawablePoints(from: line.stroke.points)
+            let settings = line.settings
+            renderer.renderLine(points, settings: settings, in: context)
         }
     }
 
     // MARK: - Private
-
-    private func draw(line: Line) {
-        let points = drawablePoints(from: line.stroke.points)
-        let settings = line.settings
-
-        guard
-            points.count > 1,
-            let context = UIGraphicsGetCurrentContext()
-        else {
-            return
-        }
-
-        context.setAlpha(settings.alpha)
-        context.setLineCap(.round)
-        context.setLineWidth(settings.width)
-        context.setShadow(offset: .zero, blur: settings.blur ?? 0, color: settings.color.cgColor)
-        context.setStrokeColor(settings.color.cgColor)
-        context.setBlendMode(settings.blendMode)
-
-        context.move(to: points[0])
-        for i in 1..<points.count {
-            let mid = CGPoint(
-                x: (points[i - 1].x + points[i].x) / 2,
-                y: (points[i - 1].y + points[i].y) / 2
-            )
-            context.addQuadCurve(to: mid, control: points[i - 1])
-        }
-        context.strokePath()
-    }
 
     private func drawablePoints(from points: [CGPoint]) -> [CGPoint] {
         let drawable: [CGPoint]

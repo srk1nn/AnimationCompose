@@ -55,7 +55,7 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
         cellSize = .init(width: cellWidth, height: cellHeight)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
-            self?.handleShowTip()
+            self?.handleShowTip(animated: true)
         }
     }
 
@@ -179,13 +179,17 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
         indexPath.item == 0 && !UserDefaults.standard.bool(forKey: Constants.showTipKey)
     }
 
-    private func handleShowTip() {
+    private func handleShowTip(animated: Bool = false) {
         let cell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? AnimaticCollectionViewCell
-        UIView.animate(withDuration: 0.3, animations: {
-            cell?.tipView.alpha = 0
-        }, completion: { _ in
+        if animated {
+            UIView.animate(withDuration: 0.3, animations: {
+                cell?.tipView.alpha = 0
+            }, completion: { _ in
+                cell?.tipView.isHidden = true
+            })
+        } else {
             cell?.tipView.isHidden = true
-        })
+        }
         UserDefaults.standard.setValue(true, forKey: Constants.showTipKey)
     }
 

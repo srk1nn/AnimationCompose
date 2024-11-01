@@ -10,6 +10,7 @@ import SwiftUI
 
 struct MainViewModel {
     let canPlay: Bool
+    let isGeneratingAnimation: Bool
     let animation: Animation
     let animationSpeed: AnimationSpeed
     let canUndo: Bool
@@ -76,11 +77,21 @@ final class MainViewController: UIViewController {
             mainView.previousDrawingView.drawingLayer = viewModel.previousLayer
             mainView.drawingView.drawingLayer = viewModel.layer
 
+            if viewModel.isGeneratingAnimation {
+                mainView.playButton.alpha = 0
+                mainView.activityIndicator.startAnimating()
+            } else {
+                mainView.activityIndicator.stopAnimating()
+                mainView.playButton.alpha = 1
+            }
+
             stopAnimating()
 
         case .animating(let images):
-            mainView.pauseButton.isEnabled = true
+            mainView.playButton.alpha = 1
             mainView.playButton.isEnabled = false
+            mainView.pauseButton.isEnabled = true
+            mainView.activityIndicator.stopAnimating()
 
             startAnimating(images: images, animationSpeed: viewModel.animationSpeed)
         }
@@ -195,6 +206,8 @@ final class MainViewController: UIViewController {
     }
     
     @IBAction private func layersTapped(_ sender: UIButton) {
+        presenter.invalidateState()
+
         guard let animatic = storyboard?.instantiateViewController(withIdentifier: "animatic") as? AnimaticViewController else {
             return
         }
