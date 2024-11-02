@@ -170,7 +170,7 @@ final class MainViewController: UIViewController {
         let create = UIAlertAction(title: "Создать", style: .default) { [weak alert] _ in
             let textField = alert?.textFields?.first
             let count = textField?.text.flatMap { Int($0) }
-            count.map { self.presenter.generateBackgroundLayers(in: self.mainView.canvasView.bounds, count: $0) }
+            count.map { self.presenter.generateBackgroundLayers(in: self.mainView.canvasView.bounds, framesCount: $0) }
         }
 
         let cancel = UIAlertAction(title: "Отмена", style: .cancel)

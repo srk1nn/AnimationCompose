@@ -36,11 +36,11 @@ final class DrawingView: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-        drawingLayer?.drawings().forEach { line in
-            guard let context = UIGraphicsGetCurrentContext() else {
-                return
-            }
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return
+        }
 
+        drawingLayer?.drawings().forEach { line in
             let points = drawablePoints(from: line.stroke.points)
             let settings = line.settings
             renderer.renderLine(points, settings: settings, in: context)

@@ -16,8 +16,8 @@ final class Renderer {
 
             let context = ctx.cgContext
 
-            // Hack for CG coordinate system
-
+            // Translated to fit into CG coordinate system
+            context.saveGState()
             context.translateBy(x: 0, y: canvas.size.height)
             context.scaleBy(x: 1.0, y: -1.0)
 
@@ -25,8 +25,7 @@ final class Renderer {
                 context.draw($0, in: canvas)
             }
 
-            context.translateBy(x: 0, y: canvas.size.height)
-            context.scaleBy(x: 1.0, y: -1.0)
+            context.restoreGState()
 
             layer.drawings().forEach {
                 renderLine($0.stroke.points, settings: $0.settings, in: context)
@@ -42,20 +41,26 @@ final class Renderer {
         }
 
         context.setAlpha(settings.alpha)
-        context.setLineCap(.round)
+        context.setLineCap(settings.lineCap)
         context.setLineWidth(settings.width)
         context.setShadow(offset: .zero, blur: settings.blur ?? 0, color: settings.color.cgColor)
         context.setStrokeColor(settings.color.cgColor)
         context.setBlendMode(settings.blendMode)
 
         context.move(to: points[0])
-        for i in 1..<points.count {
-            let mid = CGPoint(
-                x: (points[i - 1].x + points[i].x) / 2,
-                y: (points[i - 1].y + points[i].y) / 2
-            )
-            context.addQuadCurve(to: mid, control: points[i - 1])
+
+        if settings.isSmooth {
+            for i in 1..<points.count {
+                let mid = CGPoint(
+                    x: (points[i - 1].x + points[i].x) / 2,
+                    y: (points[i - 1].y + points[i].y) / 2
+                )
+                context.addQuadCurve(to: mid, control: points[i - 1])
+            }
+        } else {
+            context.addLines(between: points)
         }
+
         context.strokePath()
     }
 }

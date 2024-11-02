@@ -37,7 +37,7 @@ final class MainPresenter {
 
     private var state = State(
         animation: .idle,
-        animationSpeed: AnimationSpeed(option: .total, duration: 1),
+        animationSpeed: AnimationSpeed(option: .total, duration: 3),
         tool: .pencil,
         color: .link
     )
@@ -201,33 +201,62 @@ final class MainPresenter {
         updateUI()
     }
 
-    func generateBackgroundLayers(in canvas: CGRect, count: Int) {
-        let center = CGPoint(x: canvas.midX, y: canvas.midY)
-
-        let maxRadius = Int(hypot(canvas.width / 2, canvas.height / 2))
-        let initialRadius = 10
-        let radiusStep = 20
-        var radius = 10
-        var additionalRadius = -(maxRadius / 2)
-
-        struct Radius: Hashable {
-            let radius: Int
-            let additionalRadius: Int
-        }
-
-        var layerByRadius = [Radius: Layer]()
+    func generateBackgroundLayers(in canvas: CGRect, framesCount: Int) {
         var layers = [Layer]()
+        let lines = createInitialIcon(in: canvas)
 
-        for _ in 0..<count {
-            let radii = Radius(radius: radius, additionalRadius: additionalRadius)
-            let cachedLayer = layerByRadius[radii]
-            let layer = cachedLayer.map { Layer(layer: $0) } ?? layerCircles(center: center, radius: additionalRadius > 0 ? [radius, additionalRadius] : [radius])
-            layerByRadius[radii] = layer
+        let circleLine = Line(stroke: Stroke(points: lines.circle), settings: lineSettings(color: .white))
+        let iconLine = Line(stroke: Stroke(points: lines.icon), settings: lineSettings(color: .red, lineCap: .butt, isSmooth: false))
+        layers.append(Layer(lines: [circleLine, iconLine]))
 
+        var currentCircle = lines.circle
+        var currentIcon = lines.icon
+        var xVelocity: CGFloat = Bool.random() ? 20 : -20
+        var yVelocity: CGFloat = Bool.random() ? 20 : -20
+        var isFlippedX = false
+        var isFlippedY = false
+
+        for _ in 0..<framesCount {
+            var maxX = currentCircle[0].x
+            var minX = currentCircle[0].x
+            var maxY = currentCircle[0].y
+            var minY = currentCircle[0].y
+
+            let newCircle = currentCircle.map {
+                maxX = max(maxX, $0.x)
+                minX = min(minX, $0.x)
+                maxY = max(maxY, $0.y)
+                minY = min(minY, $0.y)
+                return CGPoint(x: $0.x + xVelocity, y: $0.y + yVelocity)
+            }
+
+            let newIcon = currentIcon.map { CGPoint(x: $0.x + xVelocity, y: $0.y + yVelocity) }
+
+            if minX <= canvas.minX || maxX >= canvas.maxX {
+                if !isFlippedX {
+                    xVelocity *= -1
+                    isFlippedX = true
+                }
+            } else {
+                isFlippedX = false
+            }
+
+            if minY <= canvas.minY || maxY >= canvas.maxY {
+                if !isFlippedY {
+                    yVelocity *= -1
+                    isFlippedY = true
+                }
+            } else {
+                isFlippedY = false
+            }
+
+            let circleLine = Line(stroke: Stroke(points: newCircle), settings: lineSettings(color: .white))
+            let iconLine = Line(stroke: Stroke(points: newIcon), settings: lineSettings(color: .red, lineCap: .butt, isSmooth: false))
+            let layer = Layer(lines: [circleLine, iconLine])
             layers.append(layer)
 
-            radius = radius > maxRadius ? initialRadius : radius + radiusStep
-            additionalRadius = additionalRadius > maxRadius ? initialRadius : additionalRadius + radiusStep
+            currentCircle = newCircle
+            currentIcon = newIcon
         }
 
         // TODO: подумать куда вставлять
@@ -271,29 +300,43 @@ final class MainPresenter {
         view?.apply(viewModel)
     }
 
-    private func lineSettings() -> Line.Settings {
+    private func lineSettings(
+        color: UIColor? = nil,
+        lineCap: CGLineCap = .round,
+        isSmooth: Bool = true
+    ) -> Line.Settings {
+
         switch state.tool {
         case .pencil:
-            Line.Settings(width: 3, alpha: 1, blur: nil, blendMode: .normal, color: state.color)
+            Line.Settings(width: 2, alpha: 1, blur: nil, blendMode: .normal, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
         case .brush:
-            Line.Settings(width: 8, alpha: 0.5, blur: 8, blendMode: .multiply, color: state.color)
+            Line.Settings(width: 6, alpha: 0.5, blur: 8, blendMode: .multiply, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
         case .eraser:
-            Line.Settings(width: 12, alpha: 1, blur: nil, blendMode: .clear, color: .clear)
+            Line.Settings(width: 12, alpha: 1, blur: nil, blendMode: .clear, lineCap: lineCap, color: color ?? .clear, isSmooth: isSmooth)
         }
     }
 
-    private func layerCircles(center: CGPoint, radius: [Int]) -> Layer {
-        let settings = lineSettings()
+    private func createInitialIcon(in canvas: CGRect) -> (circle: [CGPoint], icon: [CGPoint]) {
+        let side = canvas.width / 5
+        let available = canvas.insetBy(dx: side, dy: side)
 
-        let lines = radius
-            .map { generateCirclePoints(center: center, radius: CGFloat($0)) }
-            .map { Stroke(points: $0) }
-            .map { Line(stroke: $0, settings: settings) }
+        let frame = CGRect(
+            x: .random(in: available.minX...(available.maxX - side)),
+            y: .random(in: available.minY...(available.maxY - side)),
+            width: side,
+            height: side
+        )
 
-        return Layer(lines: lines)
+        let center = CGPoint(x: frame.midX, y: frame.midY)
+        let radius = side / 2
+
+        let circle = circlePoints(center: center, radius: radius)
+        let icon = iconPoints(in: frame.insetBy(dx: side / 4, dy: side / 4))
+
+        return (circle, icon)
     }
 
-    private func generateCirclePoints(center: CGPoint, radius: CGFloat) -> [CGPoint] {
+    private func circlePoints(center: CGPoint, radius: CGFloat) -> [CGPoint] {
         return stride(from: 0, through: 360, by: 5).map { angle in
             let radians = angle * .pi / 180
             return CGPoint(
@@ -301,5 +344,20 @@ final class MainPresenter {
                 y: center.y + radius * sin(radians)
             )
         }
+    }
+
+    private func iconPoints(in rect: CGRect) -> [CGPoint] {
+        let topLeft = CGPoint(x: rect.minX, y: rect.minY)
+        let middle = CGPoint(x: rect.midX, y: rect.midY)
+        let topRight = CGPoint(x: rect.maxX, y: rect.minY)
+        let bottomMiddle = CGPoint(x: rect.midX, y: rect.maxY)
+
+        return [
+            topLeft,
+            middle,
+            topRight,
+            middle,
+            bottomMiddle
+        ]
     }
 }
