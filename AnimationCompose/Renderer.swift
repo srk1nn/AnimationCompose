@@ -13,7 +13,6 @@ final class Renderer {
         let renderer = UIGraphicsImageRenderer(size: canvas.size)
 
         let image = renderer.image { ctx in
-
             let context = ctx.cgContext
 
             // Translated to fit into CG coordinate system
@@ -45,7 +44,6 @@ final class Renderer {
         context.setLineWidth(settings.width)
         context.setShadow(offset: .zero, blur: settings.blur ?? 0, color: settings.color.cgColor)
         context.setStrokeColor(settings.color.cgColor)
-        context.setBlendMode(settings.blendMode)
 
         context.move(to: points[0])
 

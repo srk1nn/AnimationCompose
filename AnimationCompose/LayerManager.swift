@@ -63,7 +63,7 @@ final class LayerManager {
     }
 
     /// This method may fail, due to number of layers limit
-    func insertLayers(_ layers: [Layer]) -> Bool {
+    func appendLayers(_ layers: [Layer]) -> Bool {
         let capacity = layersLimit - self.layers.count
 
         if layers.count > capacity {
@@ -71,8 +71,8 @@ final class LayerManager {
         }
 
         registerUndo {
-            self.layers.insert(contentsOf: layers, at: currentIndex)
-            currentIndex += layers.count
+            self.layers.append(contentsOf: layers)
+            currentIndex = self.layers.endIndex - 1
         }
 
         return true

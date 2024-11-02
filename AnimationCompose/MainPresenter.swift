@@ -30,14 +30,15 @@ final class MainPresenter {
 
     private let layerManager = LayerManager.shared
     private let renderer = Renderer()
-    private let gifGenerator = GIFGenerator()
+    private lazy var gifGenerator = GIFGenerator()
+    private lazy var screensaverAnimation = ScreensaverAnimation()
     private let workerQueue = DispatchQueue(label: "animation.compose.worker", qos: .userInitiated, attributes: .concurrent)
     private var animationGenerationWork: DispatchWorkItem?
     private var gifGenerationWork: DispatchWorkItem?
 
     private var state = State(
         animation: .idle,
-        animationSpeed: AnimationSpeed(option: .total, duration: 3),
+        animationSpeed: AnimationSpeed(option: .frame, duration: 1 / 30), // 30 fps
         tool: .pencil,
         color: .link
     )
@@ -202,6 +203,10 @@ final class MainPresenter {
     }
 
     func generateBackgroundLayers(in canvas: CGRect, framesCount: Int) {
+        guard framesCount > 0 else {
+            return
+        }
+
         var layers = [Layer]()
         let lines = createInitialIcon(in: canvas)
 
@@ -209,58 +214,15 @@ final class MainPresenter {
         let iconLine = Line(stroke: Stroke(points: lines.icon), settings: lineSettings(color: .red, lineCap: .butt, isSmooth: false))
         layers.append(Layer(lines: [circleLine, iconLine]))
 
-        var currentCircle = lines.circle
-        var currentIcon = lines.icon
-        var xVelocity: CGFloat = Bool.random() ? 20 : -20
-        var yVelocity: CGFloat = Bool.random() ? 20 : -20
-        var isFlippedX = false
-        var isFlippedY = false
-
-        for _ in 0..<framesCount {
-            var maxX = currentCircle[0].x
-            var minX = currentCircle[0].x
-            var maxY = currentCircle[0].y
-            var minY = currentCircle[0].y
-
-            let newCircle = currentCircle.map {
-                maxX = max(maxX, $0.x)
-                minX = min(minX, $0.x)
-                maxY = max(maxY, $0.y)
-                minY = min(minY, $0.y)
-                return CGPoint(x: $0.x + xVelocity, y: $0.y + yVelocity)
-            }
-
-            let newIcon = currentIcon.map { CGPoint(x: $0.x + xVelocity, y: $0.y + yVelocity) }
-
-            if minX <= canvas.minX || maxX >= canvas.maxX {
-                if !isFlippedX {
-                    xVelocity *= -1
-                    isFlippedX = true
-                }
-            } else {
-                isFlippedX = false
-            }
-
-            if minY <= canvas.minY || maxY >= canvas.maxY {
-                if !isFlippedY {
-                    yVelocity *= -1
-                    isFlippedY = true
-                }
-            } else {
-                isFlippedY = false
-            }
-
-            let circleLine = Line(stroke: Stroke(points: newCircle), settings: lineSettings(color: .white))
-            let iconLine = Line(stroke: Stroke(points: newIcon), settings: lineSettings(color: .red, lineCap: .butt, isSmooth: false))
+        let frames = screensaverAnimation.makeAnimation(circle: lines.circle, icon: lines.icon, canvas: canvas, framesCount: framesCount - 1)
+        frames.forEach {
+            let circleLine = Line(stroke: Stroke(points: $0.circle), settings: lineSettings(color: .white))
+            let iconLine = Line(stroke: Stroke(points: $0.icon), settings: lineSettings(color: .red, lineCap: .butt, isSmooth: false))
             let layer = Layer(lines: [circleLine, iconLine])
             layers.append(layer)
-
-            currentCircle = newCircle
-            currentIcon = newIcon
         }
 
-        // TODO: подумать куда вставлять
-        let success = layerManager.insertLayers(layers)
+        let success = layerManager.appendLayers(layers)
 
         if success {
             updateUI()
@@ -308,11 +270,11 @@ final class MainPresenter {
 
         switch state.tool {
         case .pencil:
-            Line.Settings(width: 2, alpha: 1, blur: nil, blendMode: .normal, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
+            Line.Settings(width: 2, alpha: 1, blur: nil, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
         case .brush:
-            Line.Settings(width: 6, alpha: 0.5, blur: 8, blendMode: .multiply, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
+            Line.Settings(width: 6, alpha: 0.5, blur: 8, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
         case .eraser:
-            Line.Settings(width: 12, alpha: 1, blur: nil, blendMode: .clear, lineCap: lineCap, color: color ?? .clear, isSmooth: isSmooth)
+            Line.Settings(width: 12, alpha: 1, blur: nil, lineCap: lineCap, color: color ?? .clear, isSmooth: isSmooth)
         }
     }
 

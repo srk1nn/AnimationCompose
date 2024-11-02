@@ -162,7 +162,7 @@ final class MainViewController: UIViewController {
     @IBAction func instrumentsTapped(_ sender: UIButton) {
         presenter.invalidateState()
 
-        let alert = UIAlertController(title: "Создание фона", message: "Введите количество кадров", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Создание анимации", message: "Введите количество кадров", preferredStyle: .alert)
         alert.addTextField {
             $0.keyboardType = .numberPad
         }
