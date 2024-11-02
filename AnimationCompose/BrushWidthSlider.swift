@@ -62,7 +62,7 @@ final class BrushWidthSlider: UIView {
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
 
         thumbView.backgroundColor = .white
-        thumbView.layer.cornerRadius = 10
+        thumbView.layer.cornerRadius = Constants.thumbCornerRadius
         thumbView.clipsToBounds = true
 
         layer.addSublayer(gradientLayer)
@@ -151,10 +151,11 @@ final class BrushWidthSlider: UIView {
     }
 
     private enum Constants {
-        static let leftHeight: CGFloat = 5
-        static let rightHeight: CGFloat = 12
-        static let thumbPadding: CGFloat = 4
-        static let thumbSide: CGFloat = 20
+        static let leftHeight: CGFloat = 8
+        static let rightHeight: CGFloat = 18
+        static let thumbPadding: CGFloat = 7
+        static let thumbSide: CGFloat = 26
+        static let thumbCornerRadius: CGFloat = 13
     }
 }
 

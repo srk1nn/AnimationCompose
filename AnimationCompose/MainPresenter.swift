@@ -288,7 +288,7 @@ final class MainPresenter {
         case .pencil:
             Line.Settings(width: state.pencilWidth.current, alpha: 1, blur: nil, blendMode: .normal, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
         case .brush:
-            Line.Settings(width: state.brushWidth.current, alpha: 0.25, blur: 4, blendMode: .normal, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
+            Line.Settings(width: state.brushWidth.current, alpha: 0.35, blur: 4, blendMode: .normal, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
         case .eraser:
             Line.Settings(width: 18, alpha: 1, blur: nil, blendMode: .clear, lineCap: lineCap, color: color ?? .clear, isSmooth: isSmooth)
         }
@@ -333,9 +333,9 @@ final class MainPresenter {
         return [
             topLeft,
             middle,
-            topRight,
+            bottomMiddle,
             middle,
-            bottomMiddle
+            topRight
         ]
     }
 }

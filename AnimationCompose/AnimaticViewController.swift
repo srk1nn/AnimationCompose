@@ -20,6 +20,7 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
 
     private let layerManager: LayerManager = .shared
     private var cellSize: CGSize = .zero
+    private var scaleRatio: CGFloat = 1
 
     var onDismiss: (() -> Void)?
     var canvas: CGRect = .zero
@@ -55,31 +56,12 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
         let cellWidth = floor(availableWidth / 2)
         let cellHeight = cellWidth * ratio
         cellSize = .init(width: cellWidth, height: cellHeight)
+        scaleRatio = cellWidth / canvas.width
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
             self?.handleShowTip(animated: true)
         }
     }
-
-    // TODO: подумать
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//
-//        if isTipShown() {
-//            view.layoutIfNeeded()
-//            let indexPath = IndexPath(item: layerManager.index(), section: 0)
-//            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-//        }
-//    }
-//
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//
-//        if !isTipShown() {
-//            let indexPath = IndexPath(item: layerManager.index(), section: 0)
-//            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: true)
-//        }
-//    }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -125,6 +107,7 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
         cell.numberLabel.text = "\(indexPath.item + 1)"
         cell.drawingView.relativeToCanvas = canvas
         cell.drawingView.drawingLayer = layer
+        cell.drawingView.scaleRatio = scaleRatio
         cell.tipView.isHidden = !shouldShowTip(for: indexPath)
         cell.contentView.layer.borderColor = UIColor.selected.cgColor
         cell.contentView.layer.borderWidth = (layer === layerManager.currentLayer()) ? 5 : 0

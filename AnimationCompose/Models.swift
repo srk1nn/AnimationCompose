@@ -71,7 +71,7 @@ final class Layer: NSObject {
 final class Line: NSObject {
 
     struct Settings {
-        let width: CGFloat
+        var width: CGFloat
         let alpha: CGFloat
         let blur: CGFloat?
         let blendMode: CGBlendMode

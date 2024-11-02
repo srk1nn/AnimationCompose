@@ -17,6 +17,7 @@ final class DrawingView: UIView {
     }
 
     var relativeToCanvas: CGRect?
+    var scaleRatio: CGFloat?
 
     private let renderer = Renderer()
 
@@ -42,7 +43,8 @@ final class DrawingView: UIView {
 
         drawingLayer?.drawings().forEach { line in
             let points = drawablePoints(from: line.stroke.points)
-            let settings = line.settings
+            var settings = line.settings
+            scaleRatio.map { settings.width *= $0 }
             renderer.renderLine(points, settings: settings, in: context)
         }
     }

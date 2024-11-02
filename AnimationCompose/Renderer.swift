@@ -39,8 +39,6 @@ final class Renderer {
             return
         }
 
-        context.saveGState()
-
         context.setAlpha(settings.alpha)
         context.setLineCap(settings.lineCap)
         context.setLineWidth(settings.width)
@@ -63,7 +61,5 @@ final class Renderer {
         }
 
         context.strokePath()
-
-        context.restoreGState()
     }
 }
