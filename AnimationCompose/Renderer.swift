@@ -39,11 +39,14 @@ final class Renderer {
             return
         }
 
+        context.saveGState()
+
         context.setAlpha(settings.alpha)
         context.setLineCap(settings.lineCap)
         context.setLineWidth(settings.width)
         context.setShadow(offset: .zero, blur: settings.blur ?? 0, color: settings.color.cgColor)
         context.setStrokeColor(settings.color.cgColor)
+        context.setBlendMode(settings.blendMode)
 
         context.move(to: points[0])
 
@@ -60,5 +63,7 @@ final class Renderer {
         }
 
         context.strokePath()
+
+        context.restoreGState()
     }
 }

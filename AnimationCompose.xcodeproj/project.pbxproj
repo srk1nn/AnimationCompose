@@ -24,6 +24,7 @@
 		4F90AA0B2CD11D4400FA32F9 /* GIFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F90AA0A2CD11D4400FA32F9 /* GIFGenerator.swift */; };
 		4F90AA0F2CD135A700FA32F9 /* AnimationSpeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F90AA0E2CD135A700FA32F9 /* AnimationSpeedView.swift */; };
 		4F90AA132CD1733900FA32F9 /* AnimaticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F90AA122CD1733900FA32F9 /* AnimaticViewController.swift */; };
+		4FFD5EE92CD64E990088AB7D /* BrushWidthSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFD5EE82CD64E990088AB7D /* BrushWidthSlider.swift */; };
 		4FFE79252CD404590085C10A /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFE79242CD404590085C10A /* Renderer.swift */; };
 		4FFE79272CD621AA0085C10A /* ScreensaverAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFE79262CD621AA0085C10A /* ScreensaverAnimation.swift */; };
 /* End PBXBuildFile section */
@@ -48,6 +49,7 @@
 		4F90AA0A2CD11D4400FA32F9 /* GIFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFGenerator.swift; sourceTree = "<group>"; };
 		4F90AA0E2CD135A700FA32F9 /* AnimationSpeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSpeedView.swift; sourceTree = "<group>"; };
 		4F90AA122CD1733900FA32F9 /* AnimaticViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimaticViewController.swift; sourceTree = "<group>"; };
+		4FFD5EE82CD64E990088AB7D /* BrushWidthSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushWidthSlider.swift; sourceTree = "<group>"; };
 		4FFE79242CD404590085C10A /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		4FFE79262CD621AA0085C10A /* ScreensaverAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreensaverAnimation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -88,6 +90,7 @@
 				4F90AA082CD0D1D800FA32F9 /* Collection+Safe.swift */,
 				4F90AA022CCFCB6000FA32F9 /* DrawingGestureRecognizer.swift */,
 				4F90AA042CCFD3FD00FA32F9 /* DrawingView.swift */,
+				4FFD5EE82CD64E990088AB7D /* BrushWidthSlider.swift */,
 				4F90AA0E2CD135A700FA32F9 /* AnimationSpeedView.swift */,
 				4F90AA122CD1733900FA32F9 /* AnimaticViewController.swift */,
 				4F2BAF7A2CCF92EA0058CA57 /* MainView.swift */,
@@ -191,6 +194,7 @@
 				4F90AA0F2CD135A700FA32F9 /* AnimationSpeedView.swift in Sources */,
 				4F3E8D542CD35A6D00940CEB /* LayerManager.swift in Sources */,
 				4F2BAF672CCF92D40058CA57 /* AppDelegate.swift in Sources */,
+				4FFD5EE92CD64E990088AB7D /* BrushWidthSlider.swift in Sources */,
 				4FFE79252CD404590085C10A /* Renderer.swift in Sources */,
 				4F2BAF692CCF92D40058CA57 /* SceneDelegate.swift in Sources */,
 			);

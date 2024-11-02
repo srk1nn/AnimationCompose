@@ -74,6 +74,7 @@ final class Line: NSObject {
         let width: CGFloat
         let alpha: CGFloat
         let blur: CGFloat?
+        let blendMode: CGBlendMode
         let lineCap: CGLineCap
         let color: UIColor
         let isSmooth: Bool

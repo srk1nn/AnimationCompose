@@ -18,6 +18,7 @@ struct MainViewModel {
     let canRedo: Bool
     let canRemoveLayer: Bool
     let tool: Tool
+    let brushWidth: BrushWidth?
     let color: UIColor
     let layer: Layer
     let previousLayer: Layer?
@@ -25,6 +26,7 @@ struct MainViewModel {
 
 final class MainViewController: UIViewController {
     private let presenter = MainPresenter()
+    private var brushWidth: BrushWidth?
     private var animationSpeed: AnimationSpeed?
     private var onDismissShot: (() -> Void)?
 
@@ -34,6 +36,10 @@ final class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        mainView.brushWidthSlider.onPercentChanged = {
+            self.presenter.updateWidth(percent: $0)
+        }
 
         // TODO: remove me
         UserDefaults.standard.removeObject(forKey: "animation.compose.show-tip")
@@ -97,10 +103,12 @@ final class MainViewController: UIViewController {
         }
 
         animationSpeed = viewModel.animationSpeed
+        brushWidth = viewModel.brushWidth
 
         // State always changes due to user interactions
         // So we can always hides color panel here
         hideColorPanel()
+        hideBrushWidth()
     }
 
     func showAlert(title: String, message: String? = nil) {
@@ -148,11 +156,19 @@ final class MainViewController: UIViewController {
     // MARK: - Brashes
 
     @IBAction private func pencilTapped(_ sender: UIButton) {
-        presenter.select(tool: .pencil)
+        if sender.isSelected {
+            toggleBrushWidth()
+        } else {
+            presenter.select(tool: .pencil)
+        }
     }
 
     @IBAction private func brushTapped(_ sender: UIButton) {
-        presenter.select(tool: .brush)
+        if sender.isSelected {
+            toggleBrushWidth()
+        } else {
+            presenter.select(tool: .brush)
+        }
     }
 
     @IBAction private func eraseTapped(_ sender: UIButton) {
@@ -329,6 +345,7 @@ final class MainViewController: UIViewController {
     }
 
     private func showColorPanel() {
+        hideBrushWidth()
         mainView.colorButton.isSelected = true
         mainView.colorView.isHidden = false
     }
@@ -336,6 +353,24 @@ final class MainViewController: UIViewController {
     private func hideColorPanel() {
         mainView.colorButton.isSelected = false
         mainView.colorView.isHidden = true
+    }
+
+    private func toggleBrushWidth() {
+        if mainView.brushWidthView.isHidden {
+            showBrushWidth()
+        } else {
+            hideBrushWidth()
+        }
+    }
+
+    private func showBrushWidth() {
+        hideColorPanel()
+        mainView.brushWidthSlider.brushWidth = brushWidth
+        mainView.brushWidthView.isHidden = false
+    }
+
+    private func hideBrushWidth() {
+        mainView.brushWidthView.isHidden = true
     }
 }
 

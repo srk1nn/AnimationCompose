@@ -23,6 +23,8 @@ private struct State {
     var animationSpeed: AnimationSpeed
     var tool: Tool
     var color: UIColor
+    var pencilWidth: BrushWidth
+    var brushWidth: BrushWidth
 }
 
 final class MainPresenter {
@@ -40,7 +42,9 @@ final class MainPresenter {
         animation: .idle,
         animationSpeed: AnimationSpeed(option: .frame, duration: 1 / 30), // 30 fps
         tool: .pencil,
-        color: .link
+        color: .link,
+        pencilWidth: BrushWidth(min: 1, max: 10, current: 2),
+        brushWidth: BrushWidth(min: 2, max: 15, current: 6)
     )
 
     func didLoadView() {
@@ -87,6 +91,17 @@ final class MainPresenter {
         cancelGenerationWorks()
         state.tool = tool
         updateUI()
+    }
+
+    func updateWidth(percent: CGFloat) {
+        switch state.tool {
+        case .pencil:
+            state.pencilWidth.update(percent: percent)
+        case .brush:
+            state.brushWidth.update(percent: percent)
+        default:
+            break
+        }
     }
 
     func select(color: UIColor) {
@@ -254,6 +269,7 @@ final class MainPresenter {
             canRedo: layerManager.canRedo(),
             canRemoveLayer: layers.count > 1 || layers.first?.hasLines() == true,
             tool: state.tool,
+            brushWidth: state.tool == .pencil ? state.pencilWidth : state.brushWidth,
             color: state.color,
             layer: layerManager.currentLayer(),
             previousLayer: layerManager.previousLayer()
@@ -270,11 +286,11 @@ final class MainPresenter {
 
         switch state.tool {
         case .pencil:
-            Line.Settings(width: 2, alpha: 1, blur: nil, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
+            Line.Settings(width: state.pencilWidth.current, alpha: 1, blur: nil, blendMode: .normal, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
         case .brush:
-            Line.Settings(width: 6, alpha: 0.5, blur: 8, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
+            Line.Settings(width: state.brushWidth.current, alpha: 0.25, blur: 4, blendMode: .normal, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
         case .eraser:
-            Line.Settings(width: 12, alpha: 1, blur: nil, lineCap: lineCap, color: color ?? .clear, isSmooth: isSmooth)
+            Line.Settings(width: 18, alpha: 1, blur: nil, blendMode: .clear, lineCap: lineCap, color: color ?? .clear, isSmooth: isSmooth)
         }
     }
 

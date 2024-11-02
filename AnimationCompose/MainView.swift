@@ -31,6 +31,9 @@ final class MainView: UIView {
     @IBOutlet weak var instrumentsButton: PrimaryButton!
     @IBOutlet weak var colorButton: BorderButton!
 
+    @IBOutlet weak var brushWidthView: UIView!
+    @IBOutlet weak var brushWidthSlider: BrushWidthSlider!
+    
     @IBOutlet weak var colorView: UIView!
     @IBOutlet weak var paletteButton: SecondaryButton!
     @IBOutlet weak var whiteColorButton: BorderButton!
@@ -50,6 +53,7 @@ final class MainView: UIView {
          instrumentsButton,
          colorButton,
          colorView,
+         brushWidthView,
          drawingView,
          previousDrawingView]
     }
@@ -63,6 +67,7 @@ final class MainView: UIView {
 
         if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
             colorView.layer.borderColor = UIColor.systemGray2.cgColor
+            brushWidthView.layer.borderColor = UIColor.systemGray2.cgColor
         }
     }
 
@@ -73,6 +78,7 @@ final class MainView: UIView {
 
     private func setup() {
         setupColorView()
+        setupBrushWidthView()
     }
 
     private func setupColorView() {
@@ -87,5 +93,19 @@ final class MainView: UIView {
         colorView.layer.borderColor = UIColor.systemGray2.cgColor
 
         colorView.isHidden = true
+    }
+
+    private func setupBrushWidthView() {
+        let effect = UIBlurEffect(style: .systemUltraThinMaterial)
+        let blur = UIVisualEffectView(effect: effect)
+        blur.frame = canvasView.bounds
+        blur.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        brushWidthView.insertSubview(blur, at: 0)
+
+        brushWidthView.layer.cornerRadius = 4
+        brushWidthView.layer.borderWidth = 1
+        brushWidthView.layer.borderColor = UIColor.systemGray2.cgColor
+
+        brushWidthView.isHidden = true
     }
 }

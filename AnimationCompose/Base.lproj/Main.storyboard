@@ -345,12 +345,31 @@
                                     <constraint firstItem="5OR-fu-VDO" firstAttribute="leading" secondItem="YDP-Dd-F0l" secondAttribute="leading" constant="16" id="NEo-JN-c4z"/>
                                 </constraints>
                             </view>
+                            <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zPm-Xk-DBu">
+                                <rect key="frame" x="70.666666666666686" y="710" width="212" height="52"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hp8-n8-stv" customClass="BrushWidthSlider" customModule="AnimationCompose" customModuleProvider="target">
+                                        <rect key="frame" x="16" y="16" width="180" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="180" id="oyq-5C-Cpe"/>
+                                            <constraint firstAttribute="height" constant="20" id="p1F-iL-Sw5"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="hp8-n8-stv" secondAttribute="bottom" constant="16" id="5lK-SS-wdq"/>
+                                    <constraint firstAttribute="trailing" secondItem="hp8-n8-stv" secondAttribute="trailing" constant="16" id="SNi-RM-QaC"/>
+                                    <constraint firstItem="hp8-n8-stv" firstAttribute="leading" secondItem="zPm-Xk-DBu" secondAttribute="leading" constant="16" id="gyP-kz-SZU"/>
+                                    <constraint firstItem="hp8-n8-stv" firstAttribute="top" secondItem="zPm-Xk-DBu" secondAttribute="top" constant="16" id="wIo-86-d4o"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="main"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="hfh-Uo-0kY" secondAttribute="bottom" constant="8" id="2mz-5I-AAq"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="lQQ-jQ-olf" secondAttribute="trailing" constant="16" id="4Q9-6F-Gxw"/>
+                            <constraint firstItem="zPm-Xk-DBu" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" constant="-20" id="5HQ-LH-uYd"/>
                             <constraint firstItem="OrC-YC-B6j" firstAttribute="bottom" secondItem="Z2f-WL-3Fp" secondAttribute="bottom" id="7Zn-I8-haq"/>
                             <constraint firstItem="YDP-Dd-F0l" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="7gh-Yu-zkw"/>
                             <constraint firstItem="lQQ-jQ-olf" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="BiT-nZ-GKc"/>
@@ -369,6 +388,7 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Z2f-WL-3Fp" secondAttribute="trailing" constant="16" id="lSY-aU-Tjw"/>
                             <constraint firstItem="hfh-Uo-0kY" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="n7r-XB-PE8"/>
                             <constraint firstItem="1MX-Ep-JZL" firstAttribute="top" secondItem="Z2f-WL-3Fp" secondAttribute="top" id="qSj-fJ-elQ"/>
+                            <constraint firstItem="zPm-Xk-DBu" firstAttribute="bottom" secondItem="hfh-Uo-0kY" secondAttribute="top" constant="-16" id="sDJ-Ai-ENg"/>
                             <constraint firstItem="E01-oI-4U2" firstAttribute="trailing" secondItem="1MX-Ep-JZL" secondAttribute="trailing" id="tQB-DB-7rP"/>
                             <constraint firstItem="OrC-YC-B6j" firstAttribute="trailing" secondItem="Z2f-WL-3Fp" secondAttribute="trailing" id="w71-aM-gyB"/>
                             <constraint firstItem="OrC-YC-B6j" firstAttribute="top" secondItem="Z2f-WL-3Fp" secondAttribute="top" id="y1f-D7-Lth"/>
@@ -379,6 +399,8 @@
                             <outlet property="blackColorButton" destination="UmJ-8K-7bs" id="Vlc-zg-lo9"/>
                             <outlet property="blueColorButton" destination="blS-vs-yXb" id="gQ3-A4-oNN"/>
                             <outlet property="brushButton" destination="vlh-uu-1PI" id="wRm-QV-8Cw"/>
+                            <outlet property="brushWidthSlider" destination="hp8-n8-stv" id="rqe-nA-gsU"/>
+                            <outlet property="brushWidthView" destination="zPm-Xk-DBu" id="ChB-6T-NBk"/>
                             <outlet property="canvasView" destination="Z2f-WL-3Fp" id="Max-jl-x0h"/>
                             <outlet property="colorButton" destination="09S-dx-OTw" id="3SX-HT-EQH"/>
                             <outlet property="colorView" destination="YDP-Dd-F0l" id="TVD-Za-Gf1"/>
@@ -599,22 +621,22 @@
             <color red="0.96862745098039216" green="0.96862745098039216" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="linkColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray5Color">
-            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="tertiaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.29803921568627451" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.29803921570000003" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
