@@ -153,9 +153,12 @@ final class MainPresenter {
 
     func handleSpeed() {
         cancelGIFGeneration()
-        pauseAnimation()
         updateUI()
         view?.showAnimationSpeed(state.animationSpeed)
+    }
+
+    func speedDidShown() {
+        pauseAnimation()
     }
 
     func animationSpeedDidSelect(_ animationSpeed: AnimationSpeed) {
@@ -225,12 +228,12 @@ final class MainPresenter {
                 let wasCancelled = generationGIF?.isCancelled
                 generationGIF = nil
                 if wasCancelled == false {
-                    pauseAnimation()
                     updateUI()
                     switch result {
                     case .success(let url):
                         view?.showShare(item: url)
                     case .failure(let error):
+                        pauseAnimation()
                         view?.showAlert(title: "Ошибка", message: error.localizedDescription, completion: { [self] in
                             resumeAnimation()
                         })
@@ -244,6 +247,10 @@ final class MainPresenter {
             DispatchQueue.generationQueue.async(execute: workItem)
             updateUI()
         }
+    }
+
+    func shareDidShown() {
+        pauseAnimation()
     }
 
     func shareDidClose() {

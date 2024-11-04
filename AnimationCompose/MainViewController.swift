@@ -112,12 +112,15 @@ final class MainViewController: UIViewController {
 
     func showShare(item: URL) {
         let activity = UIActivityViewController(activityItems: [item], applicationActivities: nil)
+        (activity.presentationController as? UISheetPresentationController)?.detents = [.large()]
 
         activity.completionWithItemsHandler = { [self] _, _, _, _ in
             presenter.shareDidClose()
         }
 
-        present(activity, animated: true)
+        present(activity, animated: true) { [self] in
+            presenter.shareDidShown()
+        }
     }
 
     func showAnimationSpeed(_ current: AnimationSpeed) {
@@ -140,7 +143,9 @@ final class MainViewController: UIViewController {
 
         let speedController = UIHostingController(rootView: view)
         speedController.presentationController?.delegate = self
-        present(speedController, animated: true)
+        present(speedController, animated: true) { [self] in
+            presenter.speedDidShown()
+        }
     }
 
     func showAnimationCreation() {
