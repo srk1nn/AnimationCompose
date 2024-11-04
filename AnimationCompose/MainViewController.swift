@@ -237,7 +237,11 @@ extension MainViewController {
     }
 
     @IBAction private func eraseTapped(_ sender: UIButton) {
-        presenter.select(tool: .eraser)
+        if sender.isSelected {
+            toggleBrushWidth()
+        } else {
+            presenter.select(tool: .eraser)
+        }
     }
 
     @IBAction func instrumentsTapped(_ sender: UIButton) {

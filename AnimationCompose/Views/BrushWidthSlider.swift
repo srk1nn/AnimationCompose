@@ -106,10 +106,10 @@ final class BrushWidthSlider: UIView {
         switch sender.state {
         case .changed:
             let location = sender.location(in: self)
-            let availableWidth = bounds.width - Constants.thumbPadding
+            let maxX = bounds.width - Constants.thumbPadding
 
-            if Constants.thumbPadding.isLess(than: location.x) && location.x.isLessThanOrEqualTo(availableWidth) {
-                let percent = location.x / availableWidth
+            if Constants.thumbPadding.isLess(than: location.x) && location.x.isLessThanOrEqualTo(maxX) {
+                let percent = location.x / maxX
                 thumbView.center = CGPoint(x: location.x, y: thumbView.center.y)
                 onPercentChanged?(percent)
             }
@@ -124,7 +124,7 @@ final class BrushWidthSlider: UIView {
         }
 
         let percent = brushWidth.percent()
-        let availableWidth = bounds.width - Constants.thumbPadding
+        let availableWidth = bounds.width - Constants.thumbPadding * 2
         let centerX = availableWidth * percent
         thumbView.center = CGPoint(x: centerX, y: thumbView.center.y)
     }

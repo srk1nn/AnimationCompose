@@ -20,6 +20,7 @@ private struct State {
     var color: UIColor
     var pencilWidth: BrushWidth
     var brushWidth: BrushWidth
+    var eraserWidth: BrushWidth
     var hasHitches: Bool
 }
 
@@ -38,6 +39,7 @@ final class MainPresenter {
         color: .link,
         pencilWidth: BrushWidth(min: 1, max: 10, current: 2),
         brushWidth: BrushWidth(min: 2, max: 15, current: 6),
+        eraserWidth: BrushWidth(min: 5, max: 25, current: 18),
         hasHitches: false
     )
 
@@ -53,7 +55,7 @@ final class MainPresenter {
         case .brush:
             state.brushWidth
         case .eraser:
-            nil
+            state.eraserWidth
         }
     }
 
@@ -145,7 +147,7 @@ final class MainPresenter {
         case .brush:
             state.brushWidth.update(percent: percent)
         case .eraser:
-            break
+            state.eraserWidth.update(percent: percent)
         }
     }
 
@@ -355,7 +357,7 @@ private extension MainPresenter {
         case .brush:
             Line.Settings(width: state.brushWidth.current, alpha: 0.35, blur: 4, blendMode: .normal, lineCap: lineCap, color: color ?? state.color, isSmooth: isSmooth)
         case .eraser:
-            Line.Settings(width: 18, alpha: 1, blur: nil, blendMode: .clear, lineCap: lineCap, color: color ?? .clear, isSmooth: isSmooth)
+            Line.Settings(width: state.eraserWidth.current, alpha: 1, blur: nil, blendMode: .clear, lineCap: lineCap, color: color ?? .clear, isSmooth: isSmooth)
         }
     }
 

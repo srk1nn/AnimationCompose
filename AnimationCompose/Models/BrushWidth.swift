@@ -19,11 +19,14 @@ final class BrushWidth {
     }
 
     func percent() -> CGFloat {
-        return current / max
+        let normalize = current - min
+        let distance = max - min
+        return normalize / distance
     }
 
     func update(percent: CGFloat) {
-        let width = max * percent
-        current = Swift.max(min, Swift.min(max, width))
+        let distance = max - min
+        let prenormalize = distance * percent
+        current = min + prenormalize
     }
 }
