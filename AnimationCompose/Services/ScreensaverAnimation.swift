@@ -25,8 +25,8 @@ final class ScreensaverAnimation {
 
         var currentCircle = circle
         var currentIcon = icon
-        var xVelocity: CGFloat = Bool.random() ? 3 : -3
-        var yVelocity: CGFloat = Bool.random() ? 3 : -3
+        var xVelocity: CGFloat = Bool.random() ? 8 : -8
+        var yVelocity: CGFloat = Bool.random() ? 8 : -8
 
         for _ in 0..<framesCount {
             var maxX = currentCircle[0].x

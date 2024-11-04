@@ -122,7 +122,7 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
                 let success = layerManager.insertLayer(newLayer, at: indexPath.item)
 
                 if success {
-                    collectionView.insertItems(at: [indexPath])
+                    self.collectionView.insertItems(at: [indexPath])
                     reconfigureCells()
                 } else {
                     showAlert(title: "Ошибка", message: "Превышено максимальное количество кадров")
@@ -139,7 +139,7 @@ final class AnimaticViewController: UIViewController, UICollectionViewDataSource
                 if layers.count == 1 {
                     self.collectionView.reloadData()
                 } else {
-                    collectionView.deleteItems(at: [indexPath])
+                    self.collectionView.deleteItems(at: [indexPath])
                     reconfigureCells()
                 }
             })

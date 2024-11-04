@@ -7,25 +7,6 @@
 
 import SwiftUI
 
-enum AnimationSpeedOption: CaseIterable {
-    case total
-    case frame
-
-    var name: String {
-        switch self {
-        case .total:
-            "Общая"
-        case .frame:
-            "Кадра"
-        }
-    }
-}
-
-struct AnimationSpeed {
-    let option: AnimationSpeedOption
-    let duration: TimeInterval
-}
-
 struct AnimationSpeedView: View {
     @Environment(\.dismiss) private var dismiss
     private let onSelect: (AnimationSpeed) -> Void
@@ -79,7 +60,7 @@ struct AnimationSpeedView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarTitle("Скорость анимации")
+            .navigationBarTitle("Длительность анимации")
             .toolbar {
                 Button {
                     dismiss()
@@ -106,8 +87,8 @@ struct AnimationSpeedView: View {
 private extension NumberFormatter {
     static let seconds: NumberFormatter = {
         let formatter = NumberFormatter()
-        formatter.maximumIntegerDigits = 2
-        formatter.maximumFractionDigits = 2
+        formatter.maximumIntegerDigits = 3
+        formatter.maximumFractionDigits = 3
         formatter.minimumIntegerDigits = 1
         formatter.numberStyle = .decimal
         return formatter

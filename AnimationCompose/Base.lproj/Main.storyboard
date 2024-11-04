@@ -37,7 +37,7 @@
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 <state key="normal" image="undo"/>
                                                 <connections>
-                                                    <action selector="undoTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="AqH-UE-icm"/>
+                                                    <action selector="undoTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="JDF-9y-LOc"/>
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m3r-Gt-YQh" customClass="SecondaryButton" customModule="AnimationCompose" customModuleProvider="target">
@@ -102,6 +102,22 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="jIZ-Yn-uvr">
                                         <rect key="frame" x="281" y="0.0" width="80" height="32"/>
                                         <subviews>
+                                            <button hidden="YES" opaque="NO" contentMode="bottom" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AGi-YG-li6" customClass="SecondaryButton" customModule="AnimationCompose" customModuleProvider="target">
+                                                <rect key="frame" x="-36" y="0.0" width="36" height="32"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="36" id="U8V-zY-hYm"/>
+                                                    <constraint firstAttribute="height" constant="32" id="UtM-hW-bVb"/>
+                                                </constraints>
+                                                <color key="tintColor" systemColor="systemYellowColor"/>
+                                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                <state key="normal">
+                                                    <imageReference key="image" image="exclamationmark.triangle.fill" catalog="system" symbolScale="large"/>
+                                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="19"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="hitchesTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="eXl-5X-VKs"/>
+                                                </connections>
+                                            </button>
                                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5Lj-iA-pgB" customClass="SecondaryButton" customModule="AnimationCompose" customModuleProvider="target">
                                                 <rect key="frame" x="-32" y="0.0" width="32" height="32"/>
                                                 <constraints>
@@ -406,6 +422,7 @@
                             <outlet property="colorView" destination="YDP-Dd-F0l" id="TVD-Za-Gf1"/>
                             <outlet property="drawingView" destination="1MX-Ep-JZL" id="SD8-1k-fYV"/>
                             <outlet property="eraseButton" destination="kOK-pm-ZyU" id="VMz-gG-TpW"/>
+                            <outlet property="hitchesButton" destination="AGi-YG-li6" id="ea8-tv-c2W"/>
                             <outlet property="instrumentsButton" destination="btd-0a-jEb" id="jgb-rD-wvo"/>
                             <outlet property="layersButton" destination="n89-xk-QrB" id="jv0-CZ-bf3"/>
                             <outlet property="paletteButton" destination="pPL-Yp-32k" id="EAL-aR-0Ln"/>
@@ -599,6 +616,7 @@
         <image name="ellips" width="28" height="28"/>
         <image name="ellipsis.circle" catalog="system" width="128" height="123"/>
         <image name="erase" width="32" height="32"/>
+        <image name="exclamationmark.triangle.fill" catalog="system" width="128" height="109"/>
         <image name="hand.tap.fill" catalog="system" width="115" height="128"/>
         <image name="hare" catalog="system" width="128" height="89"/>
         <image name="instruments" width="32" height="32"/>
@@ -634,6 +652,9 @@
         </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemYellowColor">
+            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="tertiaryLabelColor">
             <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.29803921570000003" colorSpace="custom" customColorSpace="sRGB"/>

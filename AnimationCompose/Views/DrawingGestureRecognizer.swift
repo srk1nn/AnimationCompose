@@ -23,15 +23,6 @@ final class DrawingGestureRecognizer: UIGestureRecognizer {
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
-//        guard
-//            let actualTouch = touches.first,
-//            let view = actualTouch.view,
-//            view.bounds.contains(actualTouch.location(in: view))
-//        else {
-//            state = .cancelled
-//            return
-//        }
-
         if add(touches: touches, event: event) {
             if state == .began {
                 state = .changed

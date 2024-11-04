@@ -15,6 +15,7 @@ final class MainView: UIView {
     @IBOutlet weak var addLayerButton: UIButton!
     @IBOutlet weak var layersButton: UIButton!
 
+    @IBOutlet weak var hitchesButton: UIButton!
     @IBOutlet weak var shareButton: SecondaryButton!
     @IBOutlet weak var speedButton: SecondaryButton!
     @IBOutlet weak var pauseButton: SecondaryButton!
@@ -59,7 +60,7 @@ final class MainView: UIView {
     }
 
     var animationViews: [UIView] {
-        [animationImageView, shareButton, speedButton]
+        [animationImageView, shareButton, speedButton, hitchesButton]
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

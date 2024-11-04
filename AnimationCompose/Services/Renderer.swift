@@ -10,28 +10,30 @@ import UIKit
 final class Renderer {
 
     func renderImage(layer: Layer, background: UIImage, canvas: CGRect) -> UIImage {
-        let renderer = UIGraphicsImageRenderer(size: canvas.size)
-
-        let image = renderer.image { ctx in
-            let context = ctx.cgContext
-
-            // Translated to fit into CG coordinate system
-            context.saveGState()
-            context.translateBy(x: 0, y: canvas.size.height)
-            context.scaleBy(x: 1.0, y: -1.0)
-
-            background.cgImage.map {
-                context.draw($0, in: canvas)
+        autoreleasepool {
+            let renderer = UIGraphicsImageRenderer(size: canvas.size)
+            
+            let image = renderer.image { ctx in
+                let context = ctx.cgContext
+                
+                // Translated to fit into CG coordinate system
+                context.saveGState()
+                context.translateBy(x: 0, y: canvas.size.height)
+                context.scaleBy(x: 1.0, y: -1.0)
+                
+                background.cgImage.map {
+                    context.draw($0, in: canvas)
+                }
+                
+                context.restoreGState()
+                
+                layer.drawings().forEach {
+                    renderLine($0.stroke.points, settings: $0.settings, in: context)
+                }
             }
-
-            context.restoreGState()
-
-            layer.drawings().forEach {
-                renderLine($0.stroke.points, settings: $0.settings, in: context)
-            }
+            
+            return image
         }
-
-        return image
     }
 
     func renderLine(_ points: [CGPoint], settings: Line.Settings, in context: CGContext) {
