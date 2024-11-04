@@ -169,7 +169,7 @@ final class MainPresenter {
 
     func playAnimation(in view: UIImageView, canvas: CGRect) {
         let layers = layerManager.allLayers()
-        let engine = RenderEngine(layers: layers, background: .canvas, canvas: canvas, view: view, delegate: self)
+        let engine = RenderEngine(layers: layers, canvas: canvas, view: view, delegate: self)
         state.animationEngine = engine
         engine.attach(animationSpeed: state.animationSpeed)
         updateUI()
@@ -261,6 +261,10 @@ final class MainPresenter {
     func animationCreationDidSelect(framesCount: Int, canvas: CGRect) {
         guard framesCount > 0 else {
             return
+        }
+
+        if state.tool == .eraser {
+            state.tool = .pencil
         }
 
         var layers = [Layer]()

@@ -14,7 +14,6 @@ protocol RenderEngineDelegate: AnyObject {
 final class RenderEngine {
     private var hitchesRegulator = HitchesRegulator()
     private let layers: [Layer]
-    private let background: UIImage
     private let canvas: CGRect
     private let view: UIImageView
     private var layerIndex: Int = 0
@@ -31,9 +30,8 @@ final class RenderEngine {
         timer != nil
     }
 
-    init(layers: [Layer], background: UIImage, canvas: CGRect, view: UIImageView, delegate: RenderEngineDelegate?) {
+    init(layers: [Layer], canvas: CGRect, view: UIImageView, delegate: RenderEngineDelegate?) {
         self.layers = layers
-        self.background = background
         self.canvas = canvas
         self.view = view
         self.delegate = delegate
@@ -81,7 +79,6 @@ final class RenderEngine {
         (0..<workers.count).forEach {
             workers[$0].render(
                 layers: layers,
-                background: background,
                 canvas: canvas,
                 workerIndex: $0,
                 workersCount: workers.count
@@ -110,7 +107,6 @@ private final class RenderWorker {
 
     func render(
         layers: [Layer],
-        background: UIImage,
         canvas: CGRect,
         workerIndex: Int,
         workersCount: Int
@@ -125,7 +121,7 @@ private final class RenderWorker {
                 if renderQueue.shouldRender {
                     if workerIndex == index % workersCount {
                         let layer = layers[index]
-                        let image = renderer.renderImage(layer: layer, background: background, canvas: canvas)
+                        let image = renderer.renderImage(layer: layer, canvas: canvas)
 
                         lock.lock()
                         if workItem?.isCancelled == false {

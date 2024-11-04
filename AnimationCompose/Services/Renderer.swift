@@ -17,21 +17,34 @@ final class Renderer {
                 let context = ctx.cgContext
                 
                 // Translated to fit into CG coordinate system
-                context.saveGState()
                 context.translateBy(x: 0, y: canvas.size.height)
                 context.scaleBy(x: 1.0, y: -1.0)
                 
                 background.cgImage.map {
                     context.draw($0, in: canvas)
                 }
-                
-                context.restoreGState()
-                
+
+                renderImage(layer: layer, canvas: canvas).cgImage.map {
+                    context.draw($0, in: canvas)
+                }
+            }
+            
+            return image
+        }
+    }
+
+    func renderImage(layer: Layer, canvas: CGRect) -> UIImage {
+        autoreleasepool {
+            let renderer = UIGraphicsImageRenderer(size: canvas.size)
+
+            let image = renderer.image { ctx in
+                let context = ctx.cgContext
+
                 layer.drawings().forEach {
                     renderLine($0.stroke.points, settings: $0.settings, in: context)
                 }
             }
-            
+
             return image
         }
     }
